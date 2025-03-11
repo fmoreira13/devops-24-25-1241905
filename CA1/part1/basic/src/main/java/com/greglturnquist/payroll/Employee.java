@@ -33,20 +33,23 @@ public class Employee {
 	private String lastName;
 	private String description;
 	private int jobYears;
+	private String email;
 
 	protected Employee() {}
 
-	public Employee(String firstName, String lastName, String description, int jobYears) {
+	public Employee(String firstName, String lastName, String description, int jobYears, String email) {
 
 		validateName(firstName);
 		validateLastName(lastName);
 		validateDescription(description);
 		validateJobYears(jobYears);
+		validadeEmail(email);
 
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.description = description;
 		this.jobYears = jobYears;
+		this.email = email;
 	}
 
 	private String validateName(String name) {
@@ -77,6 +80,13 @@ public class Employee {
 		return jobYears;
 	}
 
+	private String validadeEmail(String email) {
+		if (email == null || email.trim().isEmpty()) {
+			throw new IllegalArgumentException("Email cannot be null or blank");
+		}
+		return email;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -86,13 +96,15 @@ public class Employee {
 			Objects.equals(firstName, employee.firstName) &&
 			Objects.equals(lastName, employee.lastName) &&
 			Objects.equals(description, employee.description) &&
-			Objects.equals(jobYears, employee.jobYears);
+			Objects.equals(jobYears, employee.jobYears) &&
+				Objects.equals(email, employee.email);
+
 	}
 
 	@Override
 	public int hashCode() {
 
-		return Objects.hash(id, firstName, lastName, description, jobYears);
+		return Objects.hash(id, firstName, lastName, description, jobYears, email);
 	}
 
 	public Long getId() {
@@ -135,6 +147,14 @@ public class Employee {
 		this.jobYears = jobYears;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	@Override
 	public String toString() {
 		return "Employee{" +
@@ -143,6 +163,7 @@ public class Employee {
 				", lastName='" + lastName + '\'' +
 				", description='" + description + '\'' +
 				", jobYears=" + jobYears +
+				", email='" + email + '\'' +
 				'}';
 	}
 }
