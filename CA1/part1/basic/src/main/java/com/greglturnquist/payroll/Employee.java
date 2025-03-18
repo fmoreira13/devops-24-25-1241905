@@ -39,17 +39,12 @@ public class Employee {
 
 	public Employee(String firstName, String lastName, String description, int jobYears, String email) {
 
-		validateName(firstName);
-		validateLastName(lastName);
-		validateDescription(description);
-		validateJobYears(jobYears);
-		validadeEmail(email);
+		this.firstName = validateName(firstName);
+		this.lastName = validateLastName(lastName);
+		this.description = validateDescription(description);
+		this.jobYears = validateJobYears(jobYears);
+		this.email = validateEmail(email);
 
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.description = description;
-		this.jobYears = jobYears;
-		this.email = email;
 	}
 
 	private String validateName(String name) {
@@ -80,12 +75,20 @@ public class Employee {
 		return jobYears;
 	}
 
-	private String validadeEmail(String email) {
+	private String validateEmail(String email) {
 		if (email == null || email.trim().isEmpty()) {
 			throw new IllegalArgumentException("Email cannot be null or blank");
 		}
-		return email;
+
+		String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+
+		if (!email.toLowerCase().matches(emailRegex)) {
+			throw new IllegalArgumentException("Email must have a valid format with '@' before the domain and a proper domain after '@'");
+		}
+
+		return email.toLowerCase();
 	}
+
 
 	@Override
 	public boolean equals(Object o) {
