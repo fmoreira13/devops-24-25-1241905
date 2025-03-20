@@ -1,6 +1,20 @@
 
 # DevOps Assignment - Technical Report
 
+**Author:** Fernando Moreira
+
+**Date:** 18/03/2025
+
+**Discipline:** DevOps
+
+**Program:** SWitCH DEV
+
+**Institution:** ISEP - Instituto Superior de Engenharia do Porto
+
+## Table of Contents
+
+- [Introduction](#introduction)
+
 ## Introduction
 This technical report documents the steps and analysis taken to complete the assignment. It covers the creation of a repository on GitHub, the steps for initializing the local repository, managing issues, implementing features, and working with tags and commits. Each section includes a tutorial-style walkthrough, justifications for decisions, and details of the implementation process.
 
@@ -22,8 +36,8 @@ First, create a repository on GitHub to store your project:
 Create a local folder where your project will reside. Open a terminal and run:
 
 ```bash
-mkdir DevOps
-cd DevOps
+mkdir ~/DevOps
+cd ~/DevOps
 ```
 
 ### 3. Initialize the Local Repository and Create README.md
@@ -31,9 +45,10 @@ cd DevOps
 Initialize the local Git repository and create the `README.md` file:
 
 ```bash
-echo "# devops-24-25-1241905" >> README.md
+mkdir -p DevOps/devops-24-25-1241905/CA1/part1
+echo "# devops-24-25-1241905" >> DevOps/devops-24-25-1241905/CA1/README.md
 git init
-git add README.md
+git add DevOps/devops-24-25-1241905/CA1/README.md
 git commit -m "first commit"
 ```
 
@@ -53,20 +68,30 @@ git push -u origin main
 
 ### 5. Clone the React.js and Spring Data REST Tutorial Repository
 
-Clone the tutorial repository React.js and Spring Data REST in other folder:
+Clone the tutorial repository at https://github.com/spring-attic/tut-react-and-spring-data-rest :
 
 ```bash
+mkdir ~/git-tutorial
+cd ~/git-tutorial
 git clone https://github.com/fmoreira13/tutorial-reactjs-spring-data-rest.git
-cd tutorial-reactjs-spring-data-rest
 ```
 
-### 6. Create Directories for CA1 Project
 
-Create the necessary directory structure for Part 1 of the assignment:
+### 8. Move the `basic` Folder to `part1`
+
+Move the `basic` directory (from the cloned tutorial repository) into the `part1` folder:
 
 ```bash
-mkdir CA1/part1
+mv ~/git-tutorial/tut-react-and-spring-data-rest/basic ~/DevOps/devops-24-25-1241905/CA1/part1/
 ```
+
+Don't forget copy the global `pom.xml` from the cloned repository to the `part1` directory:
+
+```bash
+cp ~/git-tutorial/tut-react-and-spring-data-rest/pom.xml ~/DevOps/devops-24-25-1241905/CA1/part1/
+```
+
+The global pom.xml is located at the root of the cloned repository. You need to copy it to the `part1` directory so that the global dependencies and configurations are properly applied.
 
 ### 7. Create the `.gitignore` File
 
@@ -77,15 +102,6 @@ node_modules/
 *.log
 *.env
 ```
-
-### 8. Move the `Basic` Folder to `part1`
-
-Move the `Basic` directory (from the cloned tutorial repository) into the `part1` folder:
-
-```bash
-mv Basic CA1/part1/
-```
-
 ### 9. Create Tag `v1.1.0`
 
 After organizing your files, create a version tag `v1.1.0` to mark this step:
