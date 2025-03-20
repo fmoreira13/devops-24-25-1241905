@@ -1,6 +1,7 @@
 package com.greglturnquist.payroll;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EmployeeTest {
@@ -70,4 +71,41 @@ class EmployeeTest {
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> new Employee(firstName, lastName, description, -1, email), "Job years must be non-negative");
     }
+
+    @Test
+    void testValidEmail() {
+        // Arrange & Act
+        Employee employee = new Employee("Frodo", "Baggins", "Ring Bearer", 7, "frodo@isep.ipp.pt");
+
+        // Assert
+        assertEquals("frodo@isep.ipp.pt", employee.getEmail());
+    }
+
+    @Test
+    void testValidEmailWithUpperCase() {
+        // Arrange & Act
+        Employee employee = new Employee("Frodo", "Baggins", "Ring Bearer", 7, "FRODO@ISEP.IPP.PT");
+
+        // Assert
+        assertEquals("frodo@isep.ipp.pt", employee.getEmail());
+    }
+
+    @Test
+    void testInvalidEmailWithoutAtSymbol() {
+        // Arrange & Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Employee("Frodo", "Baggins", "Ring Bearer", 7, "frodoisep.ipp.pt");
+        });
+        assertEquals("Email must have a valid format with '@' before the domain and a proper domain after '@'", exception.getMessage());
+    }
+
+    @Test
+    void testInvalidEmailWithoutDotInDomain() {
+        // Arrange & Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Employee("Frodo", "Baggins", "Ring Bearer", 7, "frodo@isep");
+        });
+        assertEquals("Email must have a valid format with '@' before the domain and a proper domain after '@'", exception.getMessage());
+    }
+
 }
