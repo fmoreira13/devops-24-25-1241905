@@ -40,12 +40,33 @@
     - [5. Create a New Branch to Fix a Bug](#5-create-a-new-branch-to-fix-a-bug)
     - [6. validateEmail Method](#6-validateemail-method)
     - [7. Validation Showcase](#7-validation-showcase)
-- [Conclusion of the Assignment](#conclusion-of-the-assignment)
+- [Alternative Solution with Mercurial and SourceForge](#alternative-solution-with-mercurial-and-sourceforge)
+    - [1. Create a Repository on SourceForge](#1-create-a-repository-on-sourceforge)
+    - [2. Install Mercurial](#2-install-mercurial)
+    - [3. Initialize a Local Repository](#3-initialize-a-local-repository)
+    - [4. Add Files and Make the First Commit](#4-add-files-and-make-the-first-commit)
+    - [5. Create a .hgignore File](#5-create-a-hgignore-file)
+    - [6. Move the Basic Folder to Local Repository](#6-move-the-basic-folder-to-local-repository)
+    - [7. Link Your Local Repository with SourceForge](#7-link-your-local-repository-with-sourceforge)
+    - [8. Push Code to SourceForge](#8-push-code-to-sourceforge)
+    - [9. Create a Branch](#9-create-a-branch)
+    - [10. Switch Between Branches](#10-switch-between-branches)
+    - [11. Create and Push Tags](#11-create-and-push-tags)
+    - [12. Merge Branch Back to Default (Main) Branch](#12-merge-branch-back-to-default-main-branch)
+    - [13. View the Commit History with hg log](#13-view-the-commit-history-with-hg-log)
 - [Conclusion](#conclusion)
 
 ## Introduction
 
-__This report outlines the Version Control with Git assignment for the DevOps discipline. The task is divided into two parts: Part 1, which covers basic version control without the use of branches, and Part 2, which introduces branching for the development of new features and bug fixes. The outcomes are detailed in the Final Results section, where the final state of the application is visually demonstrated after integrating all new functionalities and resolving issues. Additionally, an Alternative Solution to Git, Subversion (SVN), is explored, comparing its features and potential applicability to the goals of this assignment.__
+This tutorial is designed to guide you through essential practices in version control, project management, and software development workflows using Git, GitHub, Mercurial, and SourceForge. Whether you are a beginner or looking to enhance your existing knowledge, this guide covers a range of topics that will help you manage your codebase, collaborate with others, and ensure high-quality software delivery.
+
+- **Version Control with Git**: We begin by introducing Git and GitHub, the most widely used tools for version control and collaborative development. You will learn how to create repositories, initialize local repositories, and push changes to GitHub, alongside best practices for managing versions with tags and branches.
+
+- **Managing Issues and Implementing Features**: Using GitHub's issue tracking system, you will learn how to create and manage issues, implement new features, and update React components while testing your code with unit tests to ensure quality.
+
+- **Alternative Solution with Mercurial and SourceForge**: For those interested in an alternative to Git, we also explore Mercurial as a version control system and SourceForge as a remote repository. You will learn how to set up, manage, and push changes using Mercurial, making this guide suitable for those working in various development environments.
+
+This tutorial will equip you with the knowledge and practical skills to manage your projects, collaborate with teammates, and maintain a robust development workflow.
 
 ---
 
@@ -450,12 +471,143 @@ Solution: Ensure the email provided follows the correct format with a valid "@" 
 
 ---
 
-## Conclusion of the Assignment
+# Alternative Solution with Mercurial and SourceForge
 
-After applying the fix and performing extensive testing to ensure its functionality, the changes were integrated into the master branch. The application version was updated to `v1.3.1`, reflecting the minor update. This version increment signifies ongoing enhancements to the application's performance and stability. Upon completion of the task, I tagged the repository with the label `ca1-part2` to mark this stage.
+## Part 1: Using Mercurial and SourceForge
+
+### 1. Create a Repository on SourceForge
+- First, create a SourceForge account if you don’t have one already. Visit [SourceForge](https://sourceforge.net/) and sign up.
+- After logging in, navigate to your profile, then click on **Create a New Project**.
+- Fill in the required details, such as the project name, description, and choose **Mercurial** as the version control system.
+- Once your project is created, SourceForge will provide you with a URL for the repository (e.g., `https://fmoreira13@hg.code.sf.net/p/devops-24-25-1241905/code`).
+
+### 2. Install Mercurial
+- Download and install Mercurial from [mercurial-scm.org](https://www.mercurial-scm.org/).
+- After installation, verify that it's working correctly with the command:
+  ```bash
+  hg --version
+  ```
+
+### 3. Initialize a Local Repository
+- In your project directory, run:
+  ```bash
+  hg init
+  ```
+  This creates a local repository in your working directory.
+
+### 4. Add Files and Make the First Commit
+- Add the files to Mercurial:
+  ```bash
+  hg add
+  ```
+- Make the first commit:
+  ```bash
+  hg commit -m "First commit"
+  ```
+
+### 5. Create a `.hgignore` File
+Create a `.hgignore` file in your project directory to specify files and directories Mercurial should ignore. For example, you can add the following lines to the `.hgignore` file:
+
+```bash
+echo "*.log" > .hgignore
+echo "*.class" >> .hgignore
+echo "node_modules/" >> .hgignore
+```
+
+### 6. Move the `basic` folder to Local Repository
+
+Move the `basic` directory from the cloned tutorial repository (like `Part 1`os this assignment):
+
+```bash
+mv ~/git-tutorial/tut-react-and-spring-data-rest/basic ~/DevOpsMercurial/devops-24-25-1241905
+```
+
+Don't forget copy the global `pom.xml` from the cloned repository:
+
+```bash
+cp ~/git-tutorial/tut-react-and-spring-data-rest/pom.xml ~/DevOpsMercurial/devops-24-25-1241905
+```
+
+The global pom.xml is located at the root of the cloned repository. You need to copy it to the project so that the global dependencies and configurations are properly applied.
+
+### 7. Link Your Local Repository with SourceForge
+- To link your local Mercurial repository to the SourceForge repository, use the `hg remote add` command with the URL provided by SourceForge:
+  ```bash
+  hg remote add origin https://fmoreira13@hg.code.sf.net/p/devops-24-25-1241905/code
+  ```
+  This sets up SourceForge as the remote for your local Mercurial repository.
+
+### 8. Push Code to SourceForge
+- Push your changes to the remote SourceForge repository:
+  ```bash
+  hg push origin
+  ```
+  This will upload your local commits to SourceForge, making them available on the remote repository.
+
+![des](imagens/sourceInicio.png)
+
+### 9. Create a Branch
+- Create a new branch for development work:
+  ```bash
+  hg branch outra-branch
+  ```
+  This will mark your working directory as part of the `outra-branch`.
+- Commit changes to the new branch:
+  ```bash
+  hg commit -m "Started feature-branch development"
+  ```
+
+### 10. Switch Between Branches
+- To switch between branches, use the `hg update` command followed by the branch name:
+  ```bash
+  hg update outra-branch
+  ```
+  This command switches your working directory to the specified branch.
+
+### 11. Create and Push Tags
+- Create a tag to mark a specific point in your project:
+  ```bash
+  hg tag v1.0
+  ```
+- Push your local tags to the remote repository:
+  ```bash
+  hg push --tags
+  ```
+
+### 12. Merge Branch Back to Default (Main) Branch
+- Once the work on your feature branch is complete, merge it back into the default (main) branch:
+  ```bash
+  hg update default
+  hg merge outra-branch
+  hg commit -m "Merged outra-branch into default"
+  ```
+
+![des](imagens/sourceFinal.png)
+
+### 13. View the Commit History with `hg log`
+To view the commit history of your repository, use the `hg log` command. This will display the list of commits, along with details such as the commit ID, author, date, and commit message.
+
+Run the following command in your project directory:
+
+```bash
+hg log
+```
+
+![des](imagens/logsMercurial.png)
+
+By using **Mercurial branches** and **tags**, and linking to **SourceForge**, you can efficiently manage different features or releases within your project and track the project’s progress with versioned milestones on SourceForge.
 
 ---
 
-## Conclusion
+### Conclusion
 
-This report documents the steps taken to complete the assignment, including setting up the repository, managing issues, implementing features, and using tags. The steps were performed in a tutorial style to ensure the process is reproducible. Each decision made during the process, such as the use of GitHub CLI for managing issues and the organization of files, was explained in detail.
+This tutorial provided a comprehensive guide to using version control systems, focusing on Git, to manage and develop a project effectively.
+
+- **Version Control with Git**: We started by exploring the basics of Git and GitHub, covering repository creation, initialization, and pushing changes to the cloud. Additionally, we delved into the process of tagging versions, managing issues, and implementing new features with the integration of React components and unit tests.
+
+- **Development Using Branches**: We explored the power of branching for feature development, bug fixes, and testing, ensuring code stability with proper versioning and integration.
+
+- **Alternative Solution with Mercurial and SourceForge**: For those preferring Mercurial, we walked through a step-by-step guide to initialize a repository, link it to SourceForge, and push changes. This offered an alternative for managing the project and collaborating efficiently with remote repositories.
+
+By the end of this tutorial, you should be well-equipped to manage version control in a variety of development environments, use Git or Mercurial to track changes, and utilize issue tracking and branching for effective project management. Whether using GitHub or SourceForge, these practices are essential for modern software development.
+
