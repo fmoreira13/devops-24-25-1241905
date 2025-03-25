@@ -411,4 +411,89 @@ psd
 thumb
 sketch
 
+# ================================
+# Gradle
+# ================================
+.gradle/
+.gradle-cache/
+**/build/
+**/gen/
+**/bin/
+captures/
+output.json
+
+# ================================
+# IDEs e configurações locais
+# ================================
+.vscode/
+.idea/
+**/.idea/
+*.iml
+*.ipr
+*.iws
+local.properties
+
+# ================================
+# Android Build Artifacts
+# ================================
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# ================================
+# Java/Kotlin Build Artifacts
+# ================================
+*.class
+*.jar
+*.war
+*.ear
+
+# ================================
+# C/C++/NDK
+# ================================
+.cxx/
+.externalNativeBuild/
+obj/
+.libs/
+*.so
+*.o
+*.obj
+*.a
+*.la
+
+# ================================
+# Logs, Debug e Outros Arquivos Temporários
+# ================================
+*.log
+*.crash
+*.stacktrace
+/test_output/
+
+# ================================
+# macOS
+# ================================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ================================
+# Windows
+# ================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ================================
+# Linux
+# ================================
+*~
+
+# ================================
+# Eclipse
+# ================================
+.classpath
+.project
+.settings/
+
 # End of https://www.toptal.com/developers/gitignore/api/java,react,intellij,intellij+all,node,macos.idea/
