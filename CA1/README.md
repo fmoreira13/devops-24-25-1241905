@@ -599,6 +599,139 @@ By using **Mercurial branches** and **tags**, and linking to **SourceForge**, yo
 
 ---
 
+## Part 2: Build Tools with Gradle
+
+### 1. Environment Setup
+
+A new directory `/CA2/Part1` was created for the assignment, followed by cloning the example application from the provided Bitbucket repository. The repository included a `build.gradle` file and the Gradle Wrapper, ensuring a consistent setup across different environments. The project was then imported into an Integrated Development Environment (IDE) with Gradle support, enabling access to built-in tools and features. To confirm that the setup was correct, a Gradle build was executed. This step ensured that all dependencies were properly installed and that the project was ready for further development. With these preparations complete, the environment was set up for the next phases of the assignment.
+
+Clone the example project repository:
+```bash
+git clone https://bitbucket.org/pssmatos/gradle_basic_demo.git
+```
+Remove the .git folder to avoid conflicts:
+```bash
+rm -rf gradle_basic_demo/.git
+```
+
+#### Gradle Basic Demo
+The Gradle Basic Demo offered a hands-on experience with a multi-threaded chat server designed to manage multiple client connections simultaneously.
+
+To set up for execution, we have to run from the project's root directory:
+```bash
+./gradlew build
+```
+![des](imagens/gradlewBuild.png)
+
+Next, the chat server was started using the command:
+```bash
+java -cp build/libs/basic_demo-0.1.0.jar basic_demo.ChatServerApp 59001
+```
+![des](imagens/javaCP.png)
+
+On the client side, connections to the chat server were established by running:
+```bash
+./gradlew runClient
+```
+![des](imagens/runClient.png)
+
+Each client successfully connected to localhost on port 59001. The `build.gradle` file was configured to allow easy adjustments for different connection settings. To showcase the server's capability of handling multiple clients, several client instances were launched in separate terminal windows. 
+
+![des](imagens/conversaEntreClient.png)
+
+### 2. Adding a New Task to Run the Server
+
+We need to add a Gradle task to run the server directly via Gradle.
+Open the `Part2/gradle_basic_demo/build.gradle` file and add the following task at the end:
+
+```gradle
+tasks.register('runServer', JavaExec) {
+    mainClass = 'basic_demo.ChatServerApp'
+    classpath = sourceSets.main.runtimeClasspath
+    args '59001' // Define the server port
+}
+```
+
+#### Running the Server with Gradle
+```
+./gradlew runServer
+```
+
+### 3. Creating a Unit Test and Configuring Gradle to Run It
+The project structure already includes the main directory inside src, where the source code resides.
+We will now create the test directory for unit tests.
+```bash
+mkdir -p src/test/java/basic_demo
+```
+
+#### Project Directory Structure
+```css
+gradle_basic_demo
+├── build.gradle
+├── gradle
+├── gradlew
+├── gradlew.bat
+├── settings.gradle
+├── src
+│   ├── main
+│   │   └── java
+│   │       └── basic_demo
+│   │           └── App.java
+│   └── test
+│       └── java
+│           └── basic_demo
+│               └── AppTest.java
+└── README.md
+```
+
+#### Configuring build.gradle
+Ensure that `JUnit` is configured in `build.gradle`.
+If not, add the following dependency:
+
+```gradle
+dependencies {
+    implementation 'org.apache.logging.log4j:log4j-api:2.11.2'
+    implementation 'org.apache.logging.log4j:log4j-core:2.11.2'
+
+    testImplementation 'junit:junit:4.12'
+}
+```
+
+#### Creating the Test Class (AppTest.java)
+Navigate to the test directory:
+```bash
+cd src/test/java/basic_demo
+touch AppTest.java
+```
+Add the following test code inside AppTest.java:
+```java
+package basic_demo;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class AppTest {
+    @Test
+    public void testAppHasAGreeting() {
+        App classUnderTest = new App();
+        assertNotNull("app should have a greeting", classUnderTest.getGreeting());
+    }
+}
+```
+
+#### Running Tests
+To run all tests using Gradle, execute:
+```bash
+./gradlew test
+```
+If everything is configured correctly, Gradle will compile the tests, execute them, and display the results in the terminal.
+
+![des](imagens/gradlewTest.png)
+
+
+
+---
+
 ### Conclusion
 
 This tutorial provided a comprehensive guide to using version control systems, focusing on Git, to manage and develop a project effectively.
