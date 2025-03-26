@@ -728,6 +728,54 @@ If everything is configured correctly, Gradle will compile the tests, execute th
 
 ![des](imagens/gradlewTest.png)
 
+### 4. New Task of Type Copy
+We will create a **Gradle task of type `Copy`** to copy the `src` folder into a new `backup` directory.
+
+Open the `build.gradle` file and add the following task at the end:
+```gradle
+tasks.register('backupSources', Copy) {
+    from 'src'
+    into 'backup'
+}
+```
+
+#### Execute the Task
+Run the following command in the terminal from the project’s root directory:
+```bash
+./gradlew backupSources
+```
+![des](imagens/gradlewCopy.png)
+
+A new folder named `backup` will be created in the project root.
+All files from the `src` directory will be copied into `backup`.
+
+### 5. New Task of Type Zip
+We will create a **Gradle task of type `Zip`** to compress the `src` folder into a `.zip file.
+
+Open the `build.gradle` file and add the following task at the end:
+```gradle
+tasks.register('zipSources', Zip) {
+    from 'src'
+    archiveFileName = 'sources.zip'
+    destinationDirectory = file("$buildDir/archives")
+}
+```
+
+#### Execute the Task
+Run the following command in the terminal:
+```bash
+./gradlew zipSources
+```
+![des](imagens/gradlewZip.png)
+
+A new folder named archives will be created inside build/.
+Inside `build/archives/`, a ZIP file named `sources.zip` will be generated, containing all files from `src`.
+
+
+
+
+
+
 
 
 ---
