@@ -9,8 +9,14 @@
 plugins {
     // Apply the application plugin to add support for building a Java application
     id 'application'
+    id 'base'
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
 
 repositories {
     mavenCentral()
@@ -25,8 +31,9 @@ dependencies {
     // Use Apache Log4J for logging
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.2'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.2'
+    testImplementation 'junit:junit:4.12'
 }
- 
+
 
 // Define the main class for the application
 mainClassName = 'basic_demo.App'
@@ -50,10 +57,20 @@ jar {
 task runClient(type:JavaExec, dependsOn: classes){
     group = "DevOps"
     description = "Launches a chat client that connects to a server on localhost:59001 "
-  
+
     classpath = sourceSets.main.runtimeClasspath
 
     mainClass = 'basic_demo.ChatClientApp'
 
     args 'localhost', '59001'
 }
+
+tasks.register('runServer', JavaExec) {
+    group = 'application'
+    description = 'Runs the Chat Server'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'basic_demo.ChatServerApp'
+    args '59001'
+}
+
+mainClassName = 'basic_demo.App'
