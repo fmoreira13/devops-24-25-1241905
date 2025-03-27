@@ -749,6 +749,9 @@ Run the following command in the terminal from the project’s root directory:
 A new folder named `backup` will be created in the project root.
 All files from the `src` directory will be copied into `backup`.
 
+![des](imagens/part2Backup.png)
+
+
 ### 5. New Task of Type Zip
 We will create a **Gradle task of type `Zip`** to compress the `src` folder into a `.zip file.
 
@@ -771,6 +774,7 @@ Run the following command in the terminal:
 A new folder named archives will be created inside build/.
 Inside `build/archives/`, a ZIP file named `sources.zip` will be generated, containing all files from `src`.
 
+![des](imagens/part2Zip.png)
 
 
 
