@@ -39,7 +39,12 @@ tasks.named('test') {
 }
 
 task copyJar(type: Copy) {
-	from("build/libs/")  // Diretório de origem onde o JAR será gerado
-	into("dist/")         // Diretório de destino onde o JAR será copiado
+	from("build/libs/")
+	into("dist/")
 }
 
+task cleanWebpack {
+	delete "src/main/resources/static/built/"
+}
+
+clean.dependsOn cleanWebpack
