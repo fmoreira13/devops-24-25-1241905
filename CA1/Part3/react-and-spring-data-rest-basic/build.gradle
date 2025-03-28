@@ -37,3 +37,9 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task copyJar(type: Copy) {
+	from("build/libs/")  // Diretório de origem onde o JAR será gerado
+	into("dist/")         // Diretório de destino onde o JAR será copiado
+}
+
