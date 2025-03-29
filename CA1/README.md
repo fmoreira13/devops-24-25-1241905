@@ -776,6 +776,174 @@ Inside `build/archives/`, a ZIP file named `sources.zip` will be generated, cont
 
 ![des](imagens/part2Zip.png)
 
+---
+
+## Part 3: Converting the Basic Version of the Tutorial Application to Gradle
+
+### 1. Set Up Initial Gradle Project
+
+The initial configuration of the Gradle project involved several crucial steps to transition from a Maven-based setup to a Gradle-based one. The process started with the creation of a dedicated branch for this part of the assignment, ensuring that all modifications related to the setup remained isolated and manageable. This was achieved by running the following command:
+```bash
+
+git checkout -b tut-basic-gradle
+```
+After that, a new Spring Boot project was generated using the Spring Initializr web tool at https://start.spring.io/. The project was set up with essential dependencies, including Rest Repositories, Thymeleaf, JPA, and H2, ensuring that all necessary components for the application’s functionality were included and managed through Gradle.
+
+![des](imagens/springInicializr.png)
+
+Once the project tructure was generated, the downloaded `.zip` file was extracted into the `CA1/Part3/` directory within the repository. This provided the foundational structure for a minimal Spring Boot application, ready to be built using Gradle. To confirm the correct setup and view the available Gradle tasks, the following command was executed from the project’s root directory:
+```bash
+./gradlew tasks
+```
+
+The output verified that multiple tasks related to building and running the application were successfully created. This detailed list of tasks highlighted the functionalities now accessible through the Gradle build tool, laying the foundation for further customization and development in the next stages of the project.
+```gradle
+Application tasks
+-----------------
+bootRun - Runs this project as a Spring Boot application.
+bootTestRun - Runs this project as a Spring Boot application using the test runtime classpath.
+
+Build tasks
+-----------
+assemble - Assembles the outputs of this project.
+bootBuildImage - Builds an OCI image of the application using the output of the bootJar task
+bootJar - Assembles an executable jar archive containing the main classes and their dependencies.
+build - Assembles and tests this project.
+buildDependents - Assembles and tests this project and all projects that depend on it.
+buildNeeded - Assembles and tests this project and all projects it depends on.
+classes - Assembles main classes.
+clean - Deletes the build directory.
+jar - Assembles a jar archive containing the classes of the 'main' feature.
+resolveMainClassName - Resolves the name of the application's main class.
+resolveTestMainClassName - Resolves the name of the application's test main class.
+testClasses - Assembles test classes.
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build.
+updateDaemonJvm - Generates or updates the Gradle Daemon JVM criteria.
+wrapper - Generates Gradle wrapper files.
+
+Documentation tasks
+-------------------
+javadoc - Generates Javadoc API documentation for the 'main' feature.
+
+Help tasks
+----------
+artifactTransforms - Displays the Artifact Transforms that can be executed in root project 'react-and-spring-data-rest-basic'.
+buildEnvironment - Displays all buildscript dependencies declared in root project 'react-and-spring-data-rest-basic'.
+dependencies - Displays all dependencies declared in root project 'react-and-spring-data-rest-basic'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'react-and-spring-data-rest-basic'.
+dependencyManagement - Displays the dependency management declared in root project 'react-and-spring-data-rest-basic'.
+help - Displays a help message.
+javaToolchains - Displays the detected java toolchains.
+outgoingVariants - Displays the outgoing variants of root project 'react-and-spring-data-rest-basic'.
+projects - Displays the sub-projects of root project 'react-and-spring-data-rest-basic'.
+properties - Displays the properties of root project 'react-and-spring-data-rest-basic'.
+resolvableConfigurations - Displays the configurations that can be resolved in root project 'react-and-spring-data-rest-basic'.
+tasks - Displays the tasks runnable from root project 'react-and-spring-data-rest-basic'.
+
+Verification tasks
+------------------
+check - Runs all checks.
+test - Runs the test suite.
+
+Rules
+-----
+Pattern: clean<TaskName>: Cleans the output files of a task.
+Pattern: build<ConfigurationName>: Assembles the artifacts of a configuration.
+
+To see all tasks and more detail, run gradlew tasks --all
+
+To see more detail about a task, run gradlew help --task <task>
+
+BUILD SUCCESSFUL in 31s
+1 actionable task: 1 executed
+```
+### Implement Existing Code
+
+This phase of the project focused on integrating the existing codebase from a basic tutorial setup into the newly structured Gradle project. The process was carefully executed to ensure all components operated correctly within the new build management system.
+
+1. **Swap the Source Directory**: The original `src` directory of the Gradle project was removed to allow for the integration of the established codebase. The `src` folder, along with its subdirectories, was copied from the tutorial project into the new Gradle project structure.
+2. **Copy Necessary Configuration Files**: Key configuration files, such as `webpack.config.js` and `package.json`, were also transferred to the project's root directory to retain the frontend build setup and dependencies.
+3. **Remove Unnecessary Directories**: After the migration, the `src/main/resources/static/built` directory was deleted. Since `webpack` automatically generates this directory during the build process, it should not be manually included in version control to prevent redundancy and potential conflicts.
+4. **Modify Import Statements**: To align with the updated project dependencies and the transition from Java EE to Jakarta EE, adjustments were made to the Java classes. In the `Employee.java` class, import statements were changed from `javax.persistence` to `jakarta.persistence`.
+5. **Update Package Manager Configuration**: The `package.json` file was modified to define a fixed version of the package manager by adding "packageManager": "npm@8.19.4". This is my version of npm, see yours npm version `npm -v`. This guarantees that the project maintains a consistent package manager version across different environments.
+6. **Starting the Application**: The command `./gradlew bootRun` was run to initiate the application, which compiles and launches the backend.
+7. **Checking the Frontend**: Navigating to http://localhost:8080 in a web browser should display a blank page. This is expected at this point, as the Gradle setup is currently missing a plugin needed to manage the frontend code, a requirement that will be resolved in the upcoming stages of the project configuration.
+
+### Set Up Frontend Plugin for Gradle
+
+To integrate the frontend build process with the newly adopted Gradle system, the `org.siouan.frontend-gradle-plugin` was implemented. This plugin is essential for handling frontend assets, much like the `frontend-maven-plugin` in Maven-based projects.
+
+1. **Incorporating the Plugin**: The `build.gradle` script was updated to include the `org.siouan.frontend` plugin compatible with the project's Java version. For Java 17, the following line was added to the plugins section of the `build.gradle` file:
+```gradle
+id "org.siouan.frontend-jdk17" version "8.0.0"
+```
+2. **Setting Up the Plugin**: To properly manage the frontend assets, configurations specific to the `Node.js` version and `script` commands were added to the `build.gradle` file. This setup defines the version of `Node.js` to be used, as well as the scripts for building, cleaning, and verifying the frontend:
+```gradle
+frontend {
+nodeVersion = "16.20.2"
+assembleScript = "run build"
+cleanScript = "run clean"
+checkScript = "run check"
+}
+```
+3. **Modifying package.json**: The scripts section in `package.json` was updated to handle the execution of `Webpack` and other tasks related to the frontend:
+```gradle
+"scripts": {
+"webpack": "webpack",
+"build": "npm run webpack",
+"check": "echo Checking frontend",
+"clean": "echo Cleaning frontend",
+"lint": "echo Linting frontend",
+"test": "echo Testing frontend"
+}
+```
+
+#### Testing the Setup
+
+**Build Verification**: Running `./gradlew build` confirmed that the project successfully built, including the frontend integration.
+
+**Application Launch**: The command `./gradlew bootRun was executed, and the application was accessed at http://localhost:8080. Unlike earlier stages, the webpage now displayed frontend content, showing that the Gradle plugin effectively managed the frontend assets during both the build and serve processes.
+
+### 2. Defining Custom Gradle Tasks
+
+#### 1. Task: copyJar
+Navigate to the root folder of your project and open the `build.gradle` file, where you define your Gradle tasks.
+Add the following code within the `build.gradle` file, preferably at the end, after existing configurations:
+```gradle
+task copyJar(type: Copy) {
+    dependsOn bootJar
+    from bootJar.outputs
+    into file("dist")
+}
+```
+To verify the functionality of the `copyJar` task, execute the following command:
+```bash
+./gradlew copyJar
+```
+
+![des](imagens/dist.png)
+
+As expected, the `.jar` file produced by the `bootJar` task was successfully moved to the `dist` directory. This confirmed that the task correctly handles the artifact, ensuring it is properly relocated and ready for distribution.
+
+
+### 2. Task: cleanWebpack
+This task is designed to remove all files generated by `Webpack` that are stored in the `src/main/resources/static/built directory. By doing so, it helps maintain a clean build environment and ensures that only the required files are included in each build, avoiding issues caused by outdated or unnecessary files.
+```gradle
+task cleanWebpack(type: Delete) {
+    delete 'src/main/resources/static/built'
+}
+clean.dependsOn cleanWebpack
+```
+Additionally, this task is set to execute automatically before Gradle's standard clean task, making it an integral part of the project's cleanup routine.
+
+To confirm that `cleanWebpack` is functioning as expected, execute:
+```bash
+./gradlew cleanWebpack
+```
+As a result, all files within the `src/main/resources/static/built` directory were removed. This confirmed that the task effectively clears outdated files, keeping the build environment organized and free of unnecessary artifacts.
 
 
 
