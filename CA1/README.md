@@ -54,19 +54,34 @@
     - [11. Create and Push Tags](#11-create-and-push-tags)
     - [12. Merge Branch Back to Default (Main) Branch](#12-merge-branch-back-to-default-main-branch)
     - [13. View the Commit History with hg log](#13-view-the-commit-history-with-hg-log)
+- [Part 2: Build Tools with Gradle](#part-2-build-tools-with-gradle)
+    - [1. Environment Setup](#1-environment-setup)
+    - [2. Adding a New Task to Run the Server](#2-adding-a-new-task-to-run-the-server)
+    - [3. Creating a Unit Test and Configuring Gradle to Run It](#3-creating-a-unit-test-and-configuring-gradle-to-run-it)
+    - [4. New Task of Type Copy](#4-new-task-of-type-copy)
+    - [5. New Task of Type Zip](#5-new-task-of-type-zip)
+- [Part 3: Converting the Basic Version of the Tutorial Application to Gradle](#part-3-converting-the-basic-version-of-the-tutorial-application-to-gradle)
+    - [1. Set Up Initial Gradle Project](#1-set-up-initial-gradle-project)
+    - [2. Defining Custom Gradle Tasks](#2-defining-custom-gradle-tasks)
+    - [Alternative Solution with Maven](#alternative-solution-with-maven)
+        - [1. Project Configuration](#1-project-configuration)
+        - [2. Comparison of Maven and Gradle](#2-comparison-of-maven-and-gradle)
 - [Conclusion](#conclusion)
 
 ## Introduction
 
-This tutorial is designed to guide you through essential practices in version control, project management, and software development workflows using Git, GitHub, Mercurial, and SourceForge. Whether you are a beginner or looking to enhance your existing knowledge, this guide covers a range of topics that will help you manage your codebase, collaborate with others, and ensure high-quality software delivery.
+This project explores the key aspects of modern software development, focusing on version control systems, build automation tools, and the best practices for managing development workflows. By leveraging tools like Git, Mercurial, Maven, and Gradle, we aim to demonstrate how each technology contributes to an efficient and collaborative development environment.
 
-- **Version Control with Git**: We begin by introducing Git and GitHub, the most widely used tools for version control and collaborative development. You will learn how to create repositories, initialize local repositories, and push changes to GitHub, alongside best practices for managing versions with tags and branches.
+#### Version Control
+Version control is essential in tracking changes, collaborating across teams, and managing project versions. This project utilizes Git and Mercurial, two of the most popular version control systems, to illustrate how these tools handle code management, versioning, and remote collaboration.
 
-- **Managing Issues and Implementing Features**: Using GitHub's issue tracking system, you will learn how to create and manage issues, implement new features, and update React components while testing your code with unit tests to ensure quality.
+#### Build Automation
+Efficient build automation is crucial for ensuring that development processes remain consistent and scalable. By exploring Gradle and Maven, we highlight how these tools can automate the build process, manage dependencies, integrate testing, and even streamline deployment.
 
-- **Alternative Solution with Mercurial and SourceForge**: For those interested in an alternative to Git, we also explore Mercurial as a version control system and SourceForge as a remote repository. You will learn how to set up, manage, and push changes using Mercurial, making this guide suitable for those working in various development environments.
+#### Tool Comparison
+Understanding the strengths and weaknesses of different tools is fundamental to making informed decisions in software development. This project compares the use of Maven and Gradle in managing a Spring Boot application, offering insights into when each tool is most beneficial, based on project needs and team expertise.
 
-This tutorial will equip you with the knowledge and practical skills to manage your projects, collaborate with teammates, and maintain a robust development workflow.
+Through the combination of these tools, this project demonstrates the importance of automation, version control, and efficient workflows in delivering high-quality software.
 
 ---
 
@@ -945,23 +960,211 @@ To confirm that `cleanWebpack` is functioning as expected, execute:
 ```
 As a result, all files within the `src/main/resources/static/built` directory were removed. This confirmed that the task effectively clears outdated files, keeping the build environment organized and free of unnecessary artifacts.
 
+---
 
+## Alternative Solution with Maven
 
+In this alternative approach, I will walk through the steps required to configure Maven for the Spring Boot application, mirroring the setup and functionality achieved with Gradle. This solution will cover the integration of frontend assets, custom build tasks, and file management. Below is a comprehensive guide to configuring Maven for the project, with the necessary adjustments to the `pom.xml`:
 
+### 1. Project Configuration
+To begin, I set up the `pom.xml` file for the Spring Boot application. This configuration includes dependencies for key components such as REST, Thymeleaf, JPA, and H2. Here's an excerpt of the `pom.xml` that includes these dependencies:
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-rest</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <scope>runtime</scope>
+    </dependency>
+</dependencies>
+```
+This ensures the backend is set up with the necessary dependencies to support Spring Boot features.
 
+#### - Frontend Build Setup
 
+In order to integrate frontend assets, I used the `frontend-maven-plugin` to manage `Node.js` and `npm installations, along with the build process. The plugin is configured as follows:
+```xml
+<plugins>
+    <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.11.0</version>
+        <configuration>
+            <nodeVersion>v16.20.2</nodeVersion>
+            <workingDirectory>src/main/resources/static</workingDirectory>
+        </configuration>
+        <executions>
+            <execution>
+                <id>install node and npm</id>
+                <goals>
+                    <goal>install-node-and-npm</goal>
+                </goals>
+            </execution>
+            <execution>
+                <id>npm install</id>
+                <goals>
+                    <goal>npm</goal>
+                    <configuration>
+                        <arguments>install</arguments>
+                    </configuration>
+                </goals>
+            </execution>
+            <execution>
+                <id>npm run build</id>
+                <goals>
+                    <goal>npm</goal>
+                    <configuration>
+                        <arguments>run build</arguments>
+                    </configuration>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>
+```
+This plugin will handle the installation of `Node.js`, `npm, and the necessary build tasks for the frontend.
+
+#### - The Task Copy JAR File to Distribution Folder
+
+To copy the generated `.jar` file to a specific distribution folder, I configured the `maven-resources-plugin to perform this task:
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-resources-plugin</artifactId>
+    <version>3.2.0</version>
+    <executions>
+        <execution>
+            <id>copy-jar</id>
+            <phase>package</phase>
+            <goals>
+                <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+                <outputDirectory>${project.build.directory}/dist</outputDirectory>
+                <resources>
+                    <resource>
+                        <directory>${project.build.directory}</directory>
+                        <includes>
+                            <include>*.jar</include>
+                        </includes>
+                    </resource>
+                </resources>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+This ensures that the `.jar` file is moved to the correct directory upon the build process.
+
+#### - The Task Cleaning Up Webpack Files
+
+To delete Webpack-generated files from the `static/built` directory, I configured the `maven-clean-plugin` to perform this cleanup during the clean phase:
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-clean-plugin</artifactId>
+    <version>3.1.0</version>
+    <executions>
+        <execution>
+            <id>delete-webpack-files</id>
+            <phase>clean</phase>
+            <goals>
+                <goal>clean</goal>
+            </goals>
+            <configuration>
+                <filesets>
+                    <fileset>
+                        <directory>src/main/resources/static/built</directory>
+                        <includes>
+                            <include>*</include>
+                        </includes>
+                    </fileset>
+                </filesets>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+This ensures that the unnecessary files from the Webpack build are removed during the cleanup process.
+
+### 2. Comparison of Maven and Gradle
+
+When choosing a **build automation tool** for your project, it's important to understand the differences between Maven and Gradle, as they each have unique strengths. Below is a comparison of the two tools across several important features:
+
+1. **Configuration Language**
+
+**Maven**: Configuration is done through XML files, providing a structured and declarative approach.
+
+**Gradle**: Utilizes a more flexible scripting approach using either Groovy or Kotlin, allowing for dynamic configuration.
+
+2. **Performance**
+
+**Maven**: Typically slower than Gradle because it follows a linear, phase-dependent build process.
+
+**Gradle**: Known for faster build times, thanks to its support for incremental builds and optimizations for up-to-date checks.
+
+3. **Dependency Management**
+
+**Maven**: Follows a centralized approach to dependency management, which makes it predictable and simple to use.
+
+**Gradle**: Provides advanced dependency management, supporting dynamic versions and more complex scenarios.
+
+4. **Flexibility**
+
+**Maven**: Less flexible due to its rigid lifecycle phases, meaning customizations can be harder to implement.
+
+**Gradle**: Offers significant flexibility, allowing for a customized build process thanks to its scripting capabilities.
+
+6. **History and Acceptance**
+
+**Maven**: With a long history, Maven has a well-established community, extensive documentation, and a wealth of resources available.
+
+**Gradle**: Although newer, Gradle has a rapidly growing community and is well-supported with ample documentation for developers.
+
+7. **Plugin Ecosystem**
+
+**Maven**: Has a wide array of available plugins, but integrating new functionality can sometimes be more challenging.
+
+**Gradle**: Features an extensive plugin ecosystem, with custom plugins easier to write and integrate due to its scripting flexibility.
+
+8. **Use Cases**
+
+**Maven**: Typically a better fit for traditional Java projects where a predictable and standardized build process is required.
+
+**Gradle**: More suited for complex, multi-project builds or projects that require extensive customization and flexibility.
+
+#### - Final Notes About Build Tools
+Maven serves as a solid alternative to Gradle when it comes to managing and building Spring Boot projects. By outlining the steps needed to replicate Gradle's functionality, we’ve highlighted how Maven excels in areas like dependency management, build automation, and plugin integration. Its methodical, structured approach, coupled with a predictable build lifecycle, makes Maven a strong choice for projects that require a standardized build process.
+
+Although Maven may not offer the same level of flexibility or performance enhancements as Gradle—particularly with features like incremental builds or dynamic scripting capabilities—it remains a popular tool in the Java ecosystem. Its simplicity and the extensive support community make it a reliable option for a wide range of development scenarios, where ease of use and consistency are prioritized over customization.
 
 ---
 
-### Conclusion
+## Conclusion
 
-This tutorial provided a comprehensive guide to using version control systems, focusing on Git, to manage and develop a project effectively.
+This assignment has provided invaluable insights into the usage of version control systems, build automation tools, and the importance of choosing the right technologies for software development.
 
-- **Version Control with Git**: We started by exploring the basics of Git and GitHub, covering repository creation, initialization, and pushing changes to the cloud. Additionally, we delved into the process of tagging versions, managing issues, and implementing new features with the integration of React components and unit tests.
+#### **Version Control with Git and Mercurial**
+We explored the fundamentals of version control, focusing on Git and Mercurial. Git, integrated with GitHub, proved to be an essential tool for managing project versions, pushing changes to the cloud, and implementing features like React components and unit tests. We also examined how branching strategies ensure code stability and smooth feature development. For those who prefer Mercurial, we provided a comprehensive guide for setting up and managing repositories with SourceForge, offering an alternative way to manage code and collaborate effectively.
+#### **Gradle as a Build Automation Tool**
+The exploration of Gradle showcased its versatility and adaptability in handling various development tasks. By automating builds, integrating unit tests, and managing file operations, we highlighted how Gradle ensures a streamlined and reliable development workflow. Custom tasks added to the `build.gradle` file, such as `runServer`, `backup`, and `archive, demonstrated Gradle’s extensibility and how it can enhance project robustness and deployment capabilities. The integration of unit tests further emphasized the tool's ability to simplify testing processes, reinforcing its role in maintaining high-quality software.
+#### **Maven vs. Gradle: Key Takeaways**
+We also examined the migration of a Spring Boot application from Maven to Gradle, comparing both tools to understand their strengths and suitability for different project needs. Maven’s structured approach is well-suited for conventional projects, while Gradle’s flexibility and scriptable environment offer a more customizable solution. This comparison not only deepened our understanding of each tool but also highlighted the importance of choosing the right one based on project requirements and team expertise.
+#### **Final Thoughts**
+The knowledge gained through this assignment has significantly broadened my understanding of the essential tools in modern software development. Whether managing code with Git or Mercurial, automating builds with Gradle, or choosing the right build tool for a specific project, these insights will contribute to more efficient and effective workflows in future projects. The experience has emphasized the importance of adaptability and the right tool selection in maintaining high standards in software development.
 
-- **Development Using Branches**: We explored the power of branching for feature development, bug fixes, and testing, ensuring code stability with proper versioning and integration.
 
-- **Alternative Solution with Mercurial and SourceForge**: For those preferring Mercurial, we walked through a step-by-step guide to initialize a repository, link it to SourceForge, and push changes. This offered an alternative for managing the project and collaborating efficiently with remote repositories.
 
-By the end of this tutorial, you should be well-equipped to manage version control in a variety of development environments, use Git or Mercurial to track changes, and utilize issue tracking and branching for effective project management. Whether using GitHub or SourceForge, these practices are essential for modern software development.
+
 
