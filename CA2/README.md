@@ -135,7 +135,7 @@ git clone https://github.com/fmoreira13/devops-24-25-1241905.git
 
 This successfully downloaded my repository onto the virtual machine, making it ready for development or further configuration.
 
-### Running the Basic Spring Boot Tutorial Project
+### Running the Basic Spring Boot Tutorial Project - Maven
 
 In this stage, I executed the basic Spring Boot tutorial project, which was a requirement from earlier assignments. The objective was to build and run the project within the virtual machine environment previously configured.
 
@@ -165,9 +165,32 @@ The application launched without issues, displaying the default homepage as expe
 
 To document the process, I took a screenshot of the application's home page as it appeared in the browser after successful deployment.
 
+### Running the Basic Spring Boot Tutorial Project - Gradle
 
+To execute the `gradle_basic_demo project, I followed a process that involved both the virtual machine and the host system environments.
 
+First, inside the virtual machine, I navigated to the gradle_basic_demo directory. From there, I compiled the project using the command:
+```bash
+./gradlew build
+```
 
+Next, the chat server was started using the command:
+```bash
+java -cp build/libs/basic_demo-0.1.0.jar basic_demo.ChatServerApp 59001
+```
+
+![des](imagens/gradlew-build.png)
+
+Because the VM was running Ubuntu Server without a graphical interface, I couldn’t launch GUI-based applications like the chat client within it. As a workaround, I switched to my host machine, opened a terminal, and navigated to a local clone of the same project directory.
+
+On the host system, I started the chat client using the following command:
+```bash
+./gradlew runClient --args="192.168.56.5 59001"
+```
+
+By specifying the VM's IP address and the correct port number, I enabled the chat client on the host to connect with the server running in the VM. I launched two separate chat windows from the host, successfully demonstrating real-time message exchange between them. This confirmed that the server-client interaction was functioning properly. To document the result, I captured a screenshot showing the live conversation and network communication.
+
+![des](imagens/chat.png)
 
 
 
