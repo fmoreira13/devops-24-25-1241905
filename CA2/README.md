@@ -14,7 +14,13 @@
 
 - [Introduction](#introduction)
 - [Part 1: Virtualization With VirtualBox ](#part-1-virtualization-with-virtualbox)
-
+- [Create a Virtual Machine](#create-a-virtual-machine)
+- [Network Configuration](#network-configuration)
+- [Install Project Dependencies](#install-project-dependencies)
+- [Cloning the Repository](#cloning-the-repository)
+- [Running the Basic Spring Boot Tutorial Project - Maven](#running-the-basic-spring-boot-tutorial-project-maven)
+- [Running the Basic Spring Boot Tutorial Project - Gradle](#running-the-basic-spring-boot-tutorial-project-gradle)
+- [Conclusion](#conclusion)
 
 ## Introduction
 
@@ -131,7 +137,9 @@ cat ~/.ssh/id_ed25519.pub
 After copying the key, I signed in to GitHub, went to Settings > SSH and GPG keys, clicked on New SSH key, and pasted the key into the input field before saving it. This step authorized the VM to communicate securely with GitHub.
 
 With SSH access in place, I proceeded to clone the repository directly into a chosen folder within the VM by executing:
+```bash
 git clone https://github.com/fmoreira13/devops-24-25-1241905.git
+```
 
 This successfully downloaded my repository onto the virtual machine, making it ready for development or further configuration.
 
@@ -192,7 +200,13 @@ By specifying the VM's IP address and the correct port number, I enabled the cha
 
 ![des](imagens/chat.png)
 
+### Conclusion
 
+This report details setting up and running a virtual environment using VirtualBox for Assignment 2 Part 1. The tasks included creating a virtual machine, configuring its network, and deploying development tools to run software projects.
+
+The experience enhanced my understanding of virtualized environments in DevOps, particularly in network configuration and software deployment. Challenges like ensuring communication between host and guest machines were addressed, offering valuable insights into virtualization.
+
+These lessons are crucial for my ongoing development in managing complex environments within DevOps.
 
 
 
