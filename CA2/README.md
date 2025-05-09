@@ -41,7 +41,7 @@ This first part of the CA2 assignment focuses on practicing with VirtualBox by r
 ![des](imagens/vm-host.png)
 ![des](imagens/vm-home.png)
 
-## Network Configuration
+### Network Configuration
 
 After completing the initial setup of the virtual machine, I proceeded to configure the network and key services to improve the VM's usability and connectivity.
 
@@ -69,3 +69,52 @@ After saving the configuration, I executed sudo netplan apply to implement the c
 To enable remote access, I installed the OpenSSH server with sudo apt install openssh-server. Then, I modified /etc/ssh/sshd_config to allow password-based logins by uncommenting the line PasswordAuthentication yes. The SSH service was restarted using sudo service ssh restart.
 
 For file transfer capabilities, I installed an FTP server by running sudo apt install vsftpd. I enabled file writing by modifying the configuration file /etc/vsftpd.conf, ensuring the line write_enable=YES was uncommented. The changes took effect after restarting the service with sudo service vsftpd restart.
+
+### Install Project Dependencies
+
+Once the virtual machine was properly configured and network access was confirmed, I proceeded to install the essential development tools needed for Java-based projects.
+
+I started by ensuring the system was fully updated. This included refreshing the list of available packages and applying any pending upgrades with the following commands:
+
+```bash
+sudo apt update
+sudo apt upgrade
+```
+
+With the system up-to-date, I installed `Git`, which is crucial for version control and source code collaboration:
+```bash
+sudo apt install git
+```
+
+To support Java development, I added both the Java Development Kit `JDK` and the Java Runtime Environment `JRE` to the system:
+```bash
+sudo apt install openjdk-17-jdk openjdk-17-jre
+```
+
+Next, I installed Maven, which handles project dependencies and automates the build process for Java applications:
+```bash
+sudo apt install maven
+```
+
+Installing Gradle required a few additional steps since it wasn't directly available in the preferred version through the package manager:
+```bash
+wget https://services.gradle.org/distributions/gradle-8.7-bin.zip
+sudo mkdir /opt/gradle
+sudo unzip -d /opt/gradle gradle-8.7-bin.zip
+```
+
+At this point, the virtual machine was fully equipped with the necessary tools to compile, build, and run Java projects.
+
+Finally, I verified the installation and functionality of each tool by checking their versions:
+```bash
+git --version
+java --version
+mvn --version
+gradle --version
+```
+
+
+
+
+
+
