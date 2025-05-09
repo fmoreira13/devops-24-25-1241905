@@ -91,12 +91,12 @@ To support Java development, I added both the Java Development Kit `JDK` and the
 sudo apt install openjdk-17-jdk openjdk-17-jre
 ```
 
-Next, I installed Maven, which handles project dependencies and automates the build process for Java applications:
+Next, I installed `Maven`, which handles project dependencies and automates the build process for Java applications:
 ```bash
 sudo apt install maven
 ```
 
-Installing Gradle required a few additional steps since it wasn't directly available in the preferred version through the package manager:
+Installing `Gradle` required a few additional steps since it wasn't directly available in the preferred version through the package manager:
 ```bash
 wget https://services.gradle.org/distributions/gradle-8.7-bin.zip
 sudo mkdir /opt/gradle
@@ -112,6 +112,34 @@ java --version
 mvn --version
 gradle --version
 ```
+
+### Cloning the Repository
+
+To bring my personal repository into the virtual machine, I first needed to establish a secure SSH connection between the VM and GitHub. Below are the steps I followed:
+
+I began by creating a new SSH key pair on the virtual machine to enable secure interactions with GitHub. This was done via the terminal with the command:
+
+```bash
+ssh-keygen -t ed25519 -C "myemail@example.com"
+```
+
+Once the key pair was generated, I needed to associate the public key with my GitHub account. I displayed the contents of the public key file using:
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+After copying the key, I signed in to GitHub, went to Settings > SSH and GPG keys, clicked on New SSH key, and pasted the key into the input field before saving it. This step authorized the VM to communicate securely with GitHub.
+
+With SSH access in place, I proceeded to clone the repository directly into a chosen folder within the VM by executing:
+git clone https://github.com/fmoreira13/devops-24-25-1241905.git
+
+This successfully downloaded my repository onto the virtual machine, making it ready for development or further configuration.
+
+
+
+
+
+
 
 
 
