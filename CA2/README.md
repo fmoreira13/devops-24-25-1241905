@@ -135,6 +135,35 @@ git clone https://github.com/fmoreira13/devops-24-25-1241905.git
 
 This successfully downloaded my repository onto the virtual machine, making it ready for development or further configuration.
 
+### Running the Basic Spring Boot Tutorial Project
+
+In this stage, I executed the basic Spring Boot tutorial project, which was a requirement from earlier assignments. The objective was to build and run the project within the virtual machine environment previously configured.
+
+First, I navigated to the project’s root folder where all necessary Spring Boot files were located. This directory holds the structure of the application.
+
+
+To verify external accessibility—such as from the host system or other devices connected to the same network—I checked the VM’s IP address using:
+```bash
+ifconfig
+```
+
+To start the application, I ran the following command from inside the project folder:
+```bash
+./mvnw spring-boot:run
+```
+
+![des](imagens/spring-run.png)
+
+Once the IP was confirmed, I accessed the application in host browser by visiting:
+```
+http://192.168.56.5:8080/
+```
+
+![des](imagens/localhost.png)
+
+The application launched without issues, displaying the default homepage as expected. This confirmed that the backend was running properly and that Spring Boot was serving the application correctly.
+
+To document the process, I took a screenshot of the application's home page as it appeared in the browser after successful deployment.
 
 
 
