@@ -211,7 +211,7 @@ To prepare the virtualized development environment with Vagrant, I completed the
 
 First, I accessed the [official Vagrant website](https://www.vagrantup.com/) and downloaded the latest version compatible with my operating system. Once downloaded, I executed the installer and followed the guided setup process. The installation was quick and required no advanced configuration.
 
-### Verifying the Installation
+#### Verifying the Installation
 
 After installation, I confirmed that Vagrant was successfully installed by running the following command in the terminal:
 
@@ -229,10 +229,149 @@ To avoid committing unnecessary files to version control, I updated the .gitigno
 .vagrant/
 *.war
 ```
-
-### 
-
 This helps keep the repository clean and ensures only relevant source files are tracked.
+
+### Cloning the Initial Repository
+
+To begin, I cloned the base Vagrant repository to obtain all necessary configuration files. This repository includes a predefined Vagrant setup that simplifies the creation of virtual machines.
+
+```bash
+git clone https://bitbucket.org/pssmatos/vagrant-multi-spring-tut-demo/
+```
+
+#### Copying the Vagrantfile
+After cloning, I copied the Vagrantfile from the cloned project to my local project directory to use the base configuration as a starting point.
+
+```bash
+cp -r ~/IdeaProjects/vagrant-multi-spring-tut-demo/ ~/IdeaProjects/DevOps/devops-24-25-1241905/CA2/Part2 
+```
+This ensures that the virtual environment configuration is now present in my working directory.
+
+### Vagrantfile Configuration
+The Vagrantfile defines how the virtual machines should be created and provisioned. After copying the base file, I made several changes to align it with the requirements of this specific project.
+
+#### Key Changes Made
+
+- Updated Repository URL: Changed the Git repository URL to point to my project.
+
+- Adjusted File Paths: Updated path references to ensure correct navigation within the VM.
+
+- Boot Command: Added a Gradle command to automatically launch the Spring Boot application.
+
+- Java Version: Replaced the default Java version with OpenJDK 17.
+
+#### Modified Vagrantfile
+
+```ruby
+# See: https://manski.net/2016/09/vagrant-multi-machine-tutorial/
+# for information about machine names on private network
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"
+
+  # This provision is common for both VMs
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update -y
+    sudo apt-get install -y iputils-ping avahi-daemon libnss-mdns unzip \
+        openjdk-17-jdk-headless
+    # ifconfig
+  SHELL
+
+  #============
+  # Configurations specific to the database VM
+  config.vm.define "db" do |db|
+    db.vm.box = "ubuntu/bionic64"
+    db.vm.hostname = "db"
+    db.vm.network "private_network", ip: "192.168.56.11"
+
+    # We want to access H2 console from the host using port 8082
+    # We want to connet to the H2 server using port 9092
+    db.vm.network "forwarded_port", guest: 8082, host: 8082
+    db.vm.network "forwarded_port", guest: 9092, host: 9092
+
+    # We need to download H2
+    db.vm.provision "shell", inline: <<-SHELL
+      wget https://repo1.maven.org/maven2/com/h2database/h2/1.4.200/h2-1.4.200.jar
+    SHELL
+
+    # The following provision shell will run ALWAYS so that we can execute the H2 server process
+    # This could be done in a different way, for instance, setiing H2 as as service, like in the following link:
+    # How to setup java as a service in ubuntu: http://www.jcgonzalez.com/ubuntu-16-java-service-wrapper-example
+    #
+    # To connect to H2 use: jdbc:h2:tcp://192.168.33.11:9092/./jpadb
+    db.vm.provision "shell", :run => 'always', inline: <<-SHELL
+      java -cp ./h2*.jar org.h2.tools.Server -web -webAllowOthers -tcp -tcpAllowOthers -ifNotExists > ~/out.txt &
+    SHELL
+  end
+
+  #============
+  # Configurations specific to the webserver VM
+  config.vm.define "web" do |web|
+    web.vm.box = "ubuntu/bionic64"
+    web.vm.hostname = "web"
+    web.vm.network "private_network", ip: "192.168.56.10"
+
+    # We set more ram memmory for this VM
+    web.vm.provider "virtualbox" do |v|
+      v.memory = 1024
+    end
+
+    # We want to access tomcat from the host using port 8080
+    web.vm.network "forwarded_port", guest: 8080, host: 8080
+
+    web.vm.provision "shell", inline: <<-SHELL, privileged: false
+      # sudo apt-get install git -y
+      # sudo apt-get install nodejs -y
+      # sudo apt-get install npm -y
+      # sudo ln -s /usr/bin/nodejs /usr/bin/node
+      # sudo apt install -y tomcat9 tomcat9-admin
+      # If you want to access Tomcat admin web page do the following:
+      # Edit /etc/tomcat9/tomcat-users.xml
+      # uncomment tomcat-users and add manager-gui to tomcat user
+
+      # Change the following command to clone your own repository!
+      git clone https://github.com/fmoreira13/devops-24-25-1241905.git
+      cd devops-24-25-1241905/CA1/Part3/react-and-spring-data-rest-basic
+      chmod u+x gradlew
+      ./gradlew clean build
+      ./gradlew bootRun
+      # To deploy the war file to tomcat9 do the following command:
+      # sudo cp ./build/libs/basic-0.0.1-SNAPSHOT.war /var/lib/tomcat9/webapps
+    SHELL
+  end
+end
+```
+
+### Spring Boot and H2 Integration
+
+#### application.properties Configuration
+
+To enable the Spring Boot application to connect to the H2 database running on the separate VM, I configured the application.properties file as follows:
+```properties
+server.servlet.context-path=/basic-0.0.1-SNAPSHOT
+spring.data.rest.base-path=/api
+
+spring.datasource.url=jdbc:h2:tcp://192.168.56.11:9092/./jpadb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+spring.h2.console.settings.web-allow-others=true
+```
+These settings ensure that the application connects to the remote H2 database, while also enabling access to the H2 console through the web interface.
+
+### React Frontend Adjustment
+
+#### Updating App.js
+To ensure the frontend interacts properly with the new backend context path, I updated the App.js file inside the React project:
+
+```javascript
+		client({ method: 'GET', path: 'http://192.168.56.11:8080/basic-0.0.1-SNAPSHOT/api/employees' }).done(response => {
+```
+This change ensures that the frontend communicates correctly with the Spring Boot API exposed on the new context path.
 
 
 
