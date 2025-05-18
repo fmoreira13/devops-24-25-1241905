@@ -20,6 +20,14 @@
 - [Cloning the Repository](#cloning-the-repository)
 - [Running the Basic Spring Boot Tutorial Project - Maven](#running-the-basic-spring-boot-tutorial-project-maven)
 - [Running the Basic Spring Boot Tutorial Project - Gradle](#running-the-basic-spring-boot-tutorial-project-gradle)
+- [Part 2: Virtualization With Vagrant ](#part-1-virtualization-with-vagrant)
+- [Installing Vagrant](#installing-vagrant)
+- [Cloning the Initial repository](#cloning-the-initial-repository)
+- [Vagrantfile Configuration](#vagrantfile-configuration)
+- [Spring Boot and H2 integration](#spring-boot-and-h2-integration)
+- [React Frontend Adjustment](#react-frontend-adjustment)
+- [Running the Project](#running-the-project)
+- [Alternative Solution](#alternative-solution)
 - [Conclusion](#conclusion)
 
 ## Introduction
@@ -373,7 +381,7 @@ To ensure the frontend interacts properly with the new backend context path, I u
 ```
 This change ensures that the frontend communicates correctly with the Spring Boot API exposed on the new context path.
 
-## Running the Project
+### Running the Project
 
 Before starting, I verified that VirtualBox was properly installed and that the Git repository I intended to clone was publicly accessible. Then, I navigated to the project folder and executed the following command:
 
@@ -403,6 +411,9 @@ client({ method: 'GET', path: 'http://192.168.56.11:8080/basic-0.0.1-SNAPSHOT/ap
   });
 ```
 
+![des](imagens/vmware.png)
+
+
 Once the VMs were running, I opened my browser and navigated to the Spring Boot app at:
 ```bash
 http://localhost:8080/basic-0.0.1-SNAPSHOT/
@@ -417,22 +428,57 @@ Using the JDBC URL configured for the remote H2 server:
 ```arduino
 jdbc:h2:tcp://192.168.56.11:9092/./jpadb
 ```
+![des](imagens/h2.png)
 
 
+### Alternative Solution
+
+This section explores using VMware as an alternative virtualization platform to VirtualBox. Below is a detailed comparison between VMware and VirtualBox, followed by instructions on how to integrate VMware with Vagrant to fulfill the requirements of this assignment.
+
+#### VMware vs. VirtualBox: Feature Comparison
+
+| Feature               | VirtualBox                                   | VMware (Workstation/Fusion)                     |
+|-----------------------|---------------------------------------------|------------------------------------------------|
+| **Type**              | Free, open-source hypervisor                 | Commercial, professional-grade hypervisor       |
+| **User Interface**    | Simple and user-friendly GUI                  | Robust but more complex GUI                      |
+| **Guest OS Support**  | Supports a broad range of operating systems  | Also supports many OSes, with better enterprise integration |
+| **Advanced Features** | Limited (basic snapshots and cloning)        | Rich features like snapshots, cloning, VM sharing |
+| **Performance**       | Adequate, but can slow down with heavy loads | High performance, optimized for complex workloads |
+| **Cost**              | Free                                           | Requires paid license after trial                |
+| **Learning Curve**    | Easier for beginners                           | More complex due to enterprise features          |
 
 
+#### Steps to Use VMware with Vagrant
 
+To use VMware as the provider with Vagrant, follow these steps:
 
+1. Install the Vagrant VMware Utility: This component enables Vagrant to control VMware virtual machines.
+   
+This is an example for linux.
+```bash
+wget https://releases.hashicorp.com/vagrant-VMware-utility/1.0.14/vagrant-VMware-utility_1.0.14_x86_64.deb
+sudo dpkg -i vagrant-VMware-utility_1.0.14_x86_64.deb
+```
 
+2. Add the VMware Plugin to Vagrant: This plugin enables Vagrant to interact with VMware providers.
+```bash
+vagrant plugin install vagrant-VMware-desktop
+```
 
+3. Configure Your Vagrantfile: Specify VMware as the provider and configure VM resources like memory and CPU cores.
+```ruby
+Vagrant.configure("2") do |config|
+  config.vm.box = "hashicorp/bionic64"
+  config.vm.provider "vmware_desktop" do |v|
+    v.vmx["memsize"] = "1024"
+    v.vmx["numvcpus"] = "2"
+  end
+end
+```
 
+By switching to VMware as the virtualization provider with Vagrant, you gain access to enhanced performance and enterprise-level features. This setup is particularly beneficial when working with complex or resource-demanding development environments.
 
-
-
-
-
-
-
+This alternative method aligns well with the goal of creating a more powerful and production-like virtualization environment for improved development workflow.
 
 
 
