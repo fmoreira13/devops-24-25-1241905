@@ -24,8 +24,9 @@
 
 ## Introduction
 
-This first part of the CA2 assignment focuses on practicing with VirtualBox by running previously developed projects inside a virtualized Ubuntu Server environment. The objective is to simulate real-world deployment scenarios by recreating a working development environment from scratch within a VM. This involves creating the virtual machine, cloning the individual GitHub repository, installing all necessary dependencies, and attempting to build and run the spring-boot-tutorial and gradle_basic_demo projects. Furthermore, networked applications such as web services and client-server chat systems are tested across the VM (acting as a server) and the host machine (acting as client or browser). Throughout this process, any issues encountered and their resolutions are documented. The final goal is to gain hands-on experience with software development in isolated, reproducible environments.
+This technical report covers the setup and configuration of a virtualized Ubuntu Server environment using VirtualBox and Vagrant to run Java Spring Boot projects. The goal was to recreate a development environment from scratch, including cloning GitHub repositories, installing dependencies, and running projects like spring-boot-tutorial and gradle_basic_demo. Networked applications such as web services and client-server chat systems were tested between the VM (server) and host machine (client).
 
+The report also details configuring Vagrant to run a Spring Boot application connected to an H2 database and explores an alternative setup using VMware with Vagrant. Challenges encountered and solutions applied are documented to provide hands-on experience with isolated, reproducible software environments.
 ## Part 1: Virtualization with VirturalBox
 
 ### Create a Virtual Machine (VM)
@@ -200,14 +201,52 @@ By specifying the VM's IP address and the correct port number, I enabled the cha
 
 ![des](imagens/chat.png)
 
+## Part 2 - Virtualization with Vagrant
+
+### Setting Up the Vagrant Environment
+
+To prepare the virtualized development environment with Vagrant, I completed the following steps:
+
+### Installing Vagrant
+
+First, I accessed the [official Vagrant website](https://www.vagrantup.com/) and downloaded the latest version compatible with my operating system. Once downloaded, I executed the installer and followed the guided setup process. The installation was quick and required no advanced configuration.
+
+### Verifying the Installation
+
+After installation, I confirmed that Vagrant was successfully installed by running the following command in the terminal:
+
+```bash
+vagrant --version
+```
+
+This returned the currently installed version of Vagrant, confirming that the tool was correctly set up on my system.
+
+### Cleaning Up the Repository
+
+To avoid committing unnecessary files to version control, I updated the .gitignore file in my project directory. The following entries were added to exclude the Vagrant working directory and any generated .war files:
+
+```gitignore
+.vagrant/
+*.war
+```
+
+### 
+
+This helps keep the repository clean and ensures only relevant source files are tracked.
+
+
+
+
+
+
+
+
+
 ### Conclusion
 
-This report details setting up and running a virtual environment using VirtualBox for Assignment 2 Part 1. The tasks included creating a virtual machine, configuring its network, and deploying development tools to run software projects.
+This report summarizes the setup and deployment of a virtual environment using VirtualBox and Vagrant for Assignment 2. It involved creating and configuring virtual machines, deploying development tools, and running Spring Boot applications connected to an H2 database. Challenges like host-guest network communication were addressed, providing practical insights into virtualization in DevOps.
 
-The experience enhanced my understanding of virtualized environments in DevOps, particularly in network configuration and software deployment. Challenges like ensuring communication between host and guest machines were addressed, offering valuable insights into virtualization.
-
-These lessons are crucial for my ongoing development in managing complex environments within DevOps.
-
+Additionally, an alternative VMware setup with Vagrant was explored, highlighting key differences and advantages over VirtualBox. These experiences have deepened my understanding of managing virtualized environments and software deployment in real-world scenarios.
 
 
 
