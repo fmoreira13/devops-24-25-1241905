@@ -373,6 +373,61 @@ To ensure the frontend interacts properly with the new backend context path, I u
 ```
 This change ensures that the frontend communicates correctly with the Spring Boot API exposed on the new context path.
 
+## Running the Project
+
+Before starting, I verified that VirtualBox was properly installed and that the Git repository I intended to clone was publicly accessible. Then, I navigated to the project folder and executed the following command:
+
+```bash
+vagrant up
+```
+This command boots up two VMs configured in the Vagrantfile:
+
+- A database VM (db) running Ubuntu at IP 192.168.56.11, hosting the H2 database server accessible on port 9092 and its web console on port 8082, both forwarded to the host machine.
+- A webserver VM (web) running Ubuntu at IP 192.168.56.10, running the Spring Boot app on port 8080, also forwarded to the host.
+
+The H2 database configuration in the Spring Boot app uses the remote H2 server URL:
+```arduino
+jdbc:h2:tcp://192.168.56.11:9092/./jpadb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+```
+
+The Spring Boot server servlet context path is set to /basic-0.0.1-SNAPSHOT and the Spring Data REST base path is /api. Therefore, the full API endpoint for employees is:
+```bash
+http://192.168.56.11:8080/basic-0.0.1-SNAPSHOT/api/employees
+```
+
+In the React frontend, the API call uses this full URL to fetch employee data, as shown in the componentDidMount lifecycle method:
+```javascript
+client({ method: 'GET', path: 'http://192.168.56.11:8080/basic-0.0.1-SNAPSHOT/api/employees' })
+  .done(response => {
+    this.setState({ employees: response.entity._embedded.employees });
+  });
+```
+
+Once the VMs were running, I opened my browser and navigated to the Spring Boot app at:
+```bash
+http://localhost:8080/basic-0.0.1-SNAPSHOT/
+```
+
+To interact with the H2 database, I accessed the H2 console at:
+```bash
+http://localhost:8082/h2-console
+```
+
+Using the JDBC URL configured for the remote H2 server:
+```arduino
+jdbc:h2:tcp://192.168.56.11:9092/./jpadb
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
