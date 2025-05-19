@@ -1,0 +1,14 @@
+# Etapa de build
+FROM gradle:8.2.0-jdk17 AS build
+WORKDIR /app
+
+# Clona o projeto diretamente
+RUN git clone https://bitbucket.org/pssmatos/gradle_basic_demo.git .
+RUN gradle build
+
+# Etapa de runtime
+FROM eclipse-temurin:17
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar app.jar
+EXPOSE 12345
+CMD ["java", "-jar", "app.jar"]
