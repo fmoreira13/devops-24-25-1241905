@@ -482,6 +482,8 @@ This alternative method aligns well with the goal of creating a more powerful an
 
 
 
+
+
 ### Conclusion
 
 This report summarizes the setup and deployment of a virtual environment using VirtualBox and Vagrant for Assignment 2. It involved creating and configuring virtual machines, deploying development tools, and running Spring Boot applications connected to an H2 database. Challenges like host-guest network communication were addressed, providing practical insights into virtualization in DevOps.

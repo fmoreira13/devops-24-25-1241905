@@ -1,14 +1,31 @@
-# Etapa de build
-FROM gradle:8.2.0-jdk17 AS build
+# Use imagem Gradle com JDK 17 para build
+FROM gradle:jdk17 AS builder
+
+# Diretório de trabalho
 WORKDIR /app
 
-# Clona o projeto diretamente
-RUN git clone https://bitbucket.org/pssmatos/gradle_basic_demo.git .
+# Clonar repositório do projeto
+RUN git clone https://github.com/fmoreira13/devops-24-25-1241905.git
+
+# Entrar na pasta do projeto
+WORKDIR /app/devops-24-25-1241905/CA1/Part2/gradle_basic_demo
+
+# Dar permissão de execução ao Gradle wrapper
+RUN chmod +x gradlew
+
+# Build do projeto
 RUN gradle build
 
-# Etapa de runtime
-FROM eclipse-temurin:17
+# Imagem menor para rodar o JAR (runtime)
+FROM eclipse-temurin:17-jre
+
 WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
-EXPOSE 12345
-CMD ["java", "-jar", "app.jar"]
+
+# Copiar JAR gerado da etapa builder
+COPY --from=builder /app/devops-24-25-1241905/CA1/Part2/gradle_basic_demo/build/libs/basic_demo-0.1.0.jar /app/basic_demo-0.1.0.jar
+
+# Expor porta do servidor
+EXPOSE 59001
+
+# Comando para rodar a aplicação
+ENTRYPOINT ["java", "-cp", "/app/basic_demo-0.1.0.jar", "basic_demo.ChatServerApp", "59001"]
