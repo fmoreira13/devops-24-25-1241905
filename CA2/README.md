@@ -701,12 +701,12 @@ RUN apt-get update && apt-get install -y git
 
 RUN git clone https://github.com/fmoreira13/devops-24-25-1241905.git .
 
-WORKDIR /usr/src/app/devops-24-25-1241905/CA1/Part3/react-and-spring-data-rest-basic
+WORKDIR /usr/src/app/CA1/Part3/react-and-spring-data-rest-basic
 
 RUN chmod +x gradlew
 RUN ./gradlew build
 
-RUN cp ./build/libs/react-and-spring-data-rest-basic-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
+RUN cp ./build/libs/react-and-spring-data-rest-basic-0.0.1-SNAPSHOT.jar /usr/local/tomcat/webapps/
 
 EXPOSE 8080
 
@@ -761,6 +761,7 @@ Use the following command to build and start the containers:
 ```bash
 docker-compose up --build
 ```
+![des](imagens/composeBuilt.png)
 
 - The Spring Boot app will be available at: http://localhost:8080
 - H2 Web Console can be accessed at: http://localhost:8082
