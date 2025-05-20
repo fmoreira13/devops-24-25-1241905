@@ -5,9 +5,9 @@ WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get install -y git
 
-RUN git clone https://github.com/vapreace/devops-23-24-JPE-PSM-1231832.git .
+RUN git clone https://github.com/fmoreira13/devops-24-25-1241905.git .
 
-WORKDIR /usr/src/app/CA2/Part2/react-and-spring-data-rest-basic
+WORKDIR /usr/src/app/devops-24-25-1241905/CA1/Part3/react-and-spring-data-rest-basic
 
 RUN chmod +x gradlew
 RUN ./gradlew build
