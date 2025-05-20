@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
   web:
@@ -10,6 +10,8 @@ services:
         ipv4_address: 192.168.56.10
     depends_on:
       - db
+    volumes:
+      - /Users/jFernando/IdeaProjects/DevOps/devops-24-25-1241905/CA1/Part3/react-and-spring-data-rest-basic:/usr/src/app/react-project
 
   db:
     build: ./db

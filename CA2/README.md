@@ -650,6 +650,188 @@ docker push moreirafernandoj/chat-server:v2
 ![des](imagens/v2Container.png)
 
 
+## Part 4 - Containers with Docker
+
+### H2 Database Image
+
+The H2 database service is defined by a Dockerfile located in the db/ directory. Below is the content:
+
+```dockerfile
+FROM ubuntu:latest
+
+RUN apt-get update && \
+    apt-get install -y openjdk-11-jdk-headless && \
+    apt-get install unzip -y && \
+    apt-get install wget -y
+
+RUN mkdir -p /usr/src/app
+
+WORKDIR /usr/src/app/
+
+RUN wget https://repo1.maven.org/maven2/com/h2database/h2/1.4.200/h2-1.4.200.jar
+
+EXPOSE 8082
+EXPOSE 9092
+
+CMD ["java", "-cp", "./h2-1.4.200.jar", "org.h2.tools.Server", "-web", "-webAllowOthers", "-tcp", "-tcpAllowOthers", "-ifNotExists"]
+```
+
+#### Description:
+- Base image: Uses ubuntu:latest for a clean environment.
+
+- Dependencies: Installs Java 11 and utilities such as wget and unzip.
+
+- JAR file: Downloads the H2 version 1.4.200 JAR directly from Maven Central.
+
+- Ports: Opens 8082 (Web UI) and 9092 (TCP access).
+
+- Startup command: Launches the H2 server allowing external connections.
+
+### Web Application Image
+
+The Spring Boot application image is defined in the `web/` folder. Here's the Dockerfile:
+
+```dockerfile
+FROM tomcat:10-jdk17-openjdk-slim
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+RUN apt-get update && apt-get install -y git
+
+RUN git clone https://github.com/fmoreira13/devops-24-25-1241905.git .
+
+WORKDIR /usr/src/app/devops-24-25-1241905/CA1/Part3/react-and-spring-data-rest-basic
+
+RUN chmod +x gradlew
+RUN ./gradlew build
+
+RUN cp ./build/libs/react-and-spring-data-rest-basic-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
+
+EXPOSE 8080
+
+CMD ["catalina.sh", "run"]
+
+```
+
+#### Notes:
+- Base image: Tomcat 10 with OpenJDK 17 in a lightweight version.
+- Source code: Clones the repository from GitHub.
+- Build process: Uses Gradle Wrapper to compile the project.
+- Deployment: Copies the built .war file to Tomcat’s deployment folder.
+- Port: Opens 8080 for web access.
+
+### docker-compose.yml
+
+Services are managed using Docker Compose with a shared user-defined network and static IPs.
+
+```yaml
+version: '3.8'
+
+services:
+  web:
+    build: ./web
+    ports:
+      - "8080:8080"
+    networks:
+      my_custom_network:
+        ipv4_address: 192.168.56.10
+    depends_on:
+      - db
+
+  db:
+    build: ./db
+    ports:
+      - "8082:8082"
+      - "9092:9092"
+    volumes:
+      - ./data:/usr/src/data-backup
+    networks:
+      my_custom_network:
+        ipv4_address: 192.168.56.11
+
+networks:
+  my_custom_network:
+    external: true
+```
+
+### Running the Application
+
+Use the following command to build and start the containers:
+```bash
+docker-compose up --build
+```
+
+- The Spring Boot app will be available at: http://localhost:8080
+- H2 Web Console can be accessed at: http://localhost:8082
+
+![des](imagens/tabelas.png)
+
+### Uploading to Docker Hub
+
+To share your custom images, follow these steps:
+
+1. List your local Docker images:
+```bash
+docker images
+```
+![des](imagens/composeImage.png)
+
+2. Tag the images:
+```bash
+docker tag <c78e1b12c30c> moreirafernandoj/part2-web:web
+docker tag <3bf99fe83dbc> moreirafernandoj/part2-db:db
+```
+
+3. Authenticate to Docker Hub:
+```bash
+docker login
+```
+
+4. Push your images:
+```bash
+docker push moreirafernandoj/part2-web:web
+docker push moreirafernandoj/part2-db:db
+```
+
+![des](imagens/composeContainer.png)
+
+### Persisting Data with Volumes
+
+To ensure data persists and allow access to the H2 JAR file outside the container:
+
+1. Enter the container shell:
+```bash
+docker-compose exec db bash
+```
+
+2. Copy the JAR file to the shared volume:
+```bash
+cp /usr/src/app/h2-1.4.200.jar /usr/src/data-backup
+exit
+```
+
+### Alternative Solution
+#### Deploying with Heroku
+
+Heroku can be used to deploy the application in the cloud:
+
+```bash
+heroku login
+heroku create my-spring-app
+git push heroku master
+heroku open
+```
+
+For Docker-based deployment:
+
+```bash
+heroku container:login
+heroku container:push web --app my-spring-app
+heroku container:push db --app my-spring-app
+heroku container:release web db --app my-spring-app
+```
+
 
 
 
