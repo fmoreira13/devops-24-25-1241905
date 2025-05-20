@@ -2,7 +2,7 @@
 
 **Author:** Fernando Moreira
 
-**Date:** 24/02/2025
+**Date:** 21/05/2025
 
 **Discipline:** DevOps
 
@@ -28,13 +28,16 @@
 - [React Frontend Adjustment](#react-frontend-adjustment)
 - [Running the Project](#running-the-project)
 - [Alternative Solution](#alternative-solution)
+- [Part 3 - Docker Container](#part-3---docker-container)
+- [Dockerfile - Version 1](#dockerfile--version-1)
+- [Dockerfile - Version 2](#dockerfile--version-2)
 - [Conclusion](#conclusion)
 
 ## Introduction
 
-This technical report covers the setup and configuration of a virtualized Ubuntu Server environment using VirtualBox and Vagrant to run Java Spring Boot projects. The goal was to recreate a development environment from scratch, including cloning GitHub repositories, installing dependencies, and running projects like spring-boot-tutorial and gradle_basic_demo. Networked applications such as web services and client-server chat systems were tested between the VM (server) and host machine (client).
+This report summarizes the setup and deployment of development environments using virtualization and containerization tools. First, an Ubuntu Server VM was created with VirtualBox and Vagrant to run Java Spring Boot projects, clone GitHub repositories, and test networked applications like web services and chat systems between host and guest. An alternative setup using VMware and a Spring Boot + H2 database configuration was also explored.
 
-The report also details configuring Vagrant to run a Spring Boot application connected to an H2 database and explores an alternative setup using VMware with Vagrant. Challenges encountered and solutions applied are documented to provide hands-on experience with isolated, reproducible software environments.
+The second part focused on Docker. A chat server was containerized using two approaches: building within the Dockerfile and copying a pre-built JAR. A web application and its database were also containerized and managed with Docker Compose. Lastly, deployment on Heroku was tested, showcasing modern, scalable deployment strategies.
 ## Part 1: Virtualization with VirturalBox
 
 ### Create a Virtual Machine (VM)
@@ -481,15 +484,191 @@ By switching to VMware as the virtualization provider with Vagrant, you gain acc
 This alternative method aligns well with the goal of creating a more powerful and production-like virtualization environment for improved development workflow.
 
 
+## Part 3 - Docker Container
+
+### Environment Preparation
+
+To begin using Docker with the chat server from CA2, I first confirmed Docker was installed on my system. Additionally, I needed to clone the chat server repository from GitHub, which contains the basic Gradle project created in CA1. The repository can be cloned with the command:
+
+```bash
+git clone https://github.com/fmoreira13/devops-24-25-1241905.git
+```
+
+### Dockerfile — Version 1
+
+Here are the steps I followed to configure and run the chat server inside a Docker container:
+
+- Verified that Docker was active on my system.
+
+- Changed directory to where the Dockerfile was located.
+
+- Below is the content of the Dockerfile I created:
+
+```bash
+# Use imagem Gradle com JDK 17 para build
+FROM gradle:jdk17 AS builder
+
+# Diretório de trabalho
+WORKDIR /app
+
+# Clonar repositório do projeto
+RUN git clone https://github.com/fmoreira13/devops-24-25-1241905.git
+
+# Entrar na pasta do projeto
+WORKDIR /app/devops-24-25-1241905/CA1/Part2/gradle_basic_demo
+
+# Dar permissão de execução ao Gradle wrapper
+RUN chmod +x gradlew
+
+# Build do projeto
+RUN gradle build
+
+# Imagem menor para rodar o JAR (runtime)
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+# Copiar JAR gerado da etapa builder
+COPY --from=builder /app/devops-24-25-1241905/CA1/Part2/gradle_basic_demo/build/libs/basic_demo-0.1.0.jar /app/basic_demo-0.1.0.jar
+
+# Expor porta do servidor
+EXPOSE 59001
+
+# Comando para rodar a aplicação
+ENTRYPOINT ["java", "-cp", "/app/basic_demo-0.1.0.jar", "basic_demo.ChatServerApp", "59001"]
+```
+
+This Dockerfile starts by using a Gradle image with JDK 17 to clone the repo and build the project. After the build completes, it switches to a lightweight JRE image to keep the final container size minimal. The compiled JAR is copied over and the server is set to listen on port 59001.
+
+- Built the Docker image with the command:
+```bash
+docker build -t moreirafernandoj/chat-server:v1 -f Dockerfile1 .
+```
+
+Verified the image was created successfully by running:
+```bash
+docker images
+```
+
+![des](imagens/dockerImageV1.png)
+
+Started the Docker container using:
+```bash
+docker run -p 59001:59001 moreirafernandoj/chat-server:v1
+```
+
+![des](imagens/dockerRunInicio.png)
+
+The -p flag maps port 59001 of the host machine to the container’s port 59001. This started the chat server inside the container.
+
+In a separate terminal, I navigated to the chat client directory and executed:
+```bash
+./gradlew build
+./gradlew runClient
+```
+
+![des](imagens/dockerChat.png)
+
+Opened two client instances to connect to the chat server running inside the container. Messages exchanged between clients worked flawlessly. The chat server terminal showed client connections and disconnections.
+
+![des](imagens/dockerRunFinal.png)
+
+Finally, I uploaded the Docker image to Docker Hub with:
+```bash
+docker push moreirafernandoj/chat-server:v1
+```
+![des](imagens/imageV1.png)
+
+![des](imagens/containerV1.png)
+
+The image appeared successfully in my Docker Hub repository.
+
+### Dockerfile — Version 2
+
+For this second approach, I first built the chat server on my local machine, then copied the compiled JAR into the Docker image. The process was as follows:
+Ran the Gradle build command in the project directory to produce the JAR file:
+```bash
+./gradlew build
+```
+
+The output JAR was located at `build/libs/basic_demo-0.1.0.jar`.
+
+Moved to the directory containing the Dockerfile for version 2.
+
+The Dockerfile2 content is:
+
+```bash
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+COPY basic_demo-0.1.0.jar /app/basic_demo-0.1.0.jar
+
+EXPOSE 59001
+
+ENTRYPOINT ["java", "-cp", "/app/basic_demo-0.1.0.jar", "basic_demo.ChatServerApp", "59001"]
+```
+
+This simpler Dockerfile doesn’t perform any build steps; it just copies the pre-built JAR and sets the container to run it.
+
+- Built the Docker image with the command:
+```bash
+docker build -t moreirafernandoj/chat-server:v2 -f Dockerfile2 .
+```
+
+Verified the image was created successfully by running:
+```bash
+docker images
+```
+
+![des](imagens/v2DockerImagem.png)
+
+Started the Docker container using:
+```bash
+docker run -p 59001:59001 moreirafernandoj/chat-server:v2
+```
+
+![des](imagens/v2dockerRunInicio.png)
+
+Launched two chat clients from separate terminals with:
+```bash
+./gradlew runClient
+```
+
+![des](imagens/v2chat.png)
+
+Both clients connected successfully and exchanged messages. The container logs showed client activity.
+
+![des](imagens/v2dockerRunFinal.png)
+
+Finally, pushed the image to Docker Hub:
+```bash
+docker push moreirafernandoj/chat-server:v2
+```
+![des](imagens/v2imagem.png)
+
+![des](imagens/v2Container.png)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 ### Conclusion
 
-This report summarizes the setup and deployment of a virtual environment using VirtualBox and Vagrant for Assignment 2. It involved creating and configuring virtual machines, deploying development tools, and running Spring Boot applications connected to an H2 database. Challenges like host-guest network communication were addressed, providing practical insights into virtualization in DevOps.
+This assignment provided hands-on experience with both virtualization and containerization, essential components of modern DevOps. I began by setting up a virtual environment using VirtualBox and Vagrant to deploy a Spring Boot application connected to an H2 database, later comparing it with a VMware-based setup to evaluate different virtualization tools.
 
-Additionally, an alternative VMware setup with Vagrant was explored, highlighting key differences and advantages over VirtualBox. These experiences have deepened my understanding of managing virtualized environments and software deployment in real-world scenarios.
+I then containerized a chat server and a web application with Docker, creating images using two approaches—building within the Dockerfile and using pre-built JARs. Docker Compose was used to orchestrate the web application and its database, including persistent storage through volumes. Finally, I explored deploying the application on Heroku, demonstrating the flexibility of cloud platforms.
 
+Together, these tasks enhanced my understanding of virtualized environments, container orchestration, and scalable cloud deployment.
 
 
 
