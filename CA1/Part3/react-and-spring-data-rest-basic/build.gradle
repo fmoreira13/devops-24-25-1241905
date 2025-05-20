@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'war' // ✅ Adicionado para gerar WAR
+	id 'war'
 	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id "org.siouan.frontend-jdk17" version "8.0.0"
@@ -30,7 +30,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat' // ✅ para war
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -40,14 +40,17 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-bootWar {
-	archiveFileName = 'ROOT.war' // ✅ Tomcat carrega automaticamente esse nome
+bootJar {
+	enabled = false
 }
 
-task copyWar(type: Copy) {
+bootWar {
+	enabled = true
+}
+
+task copyJar(type: Copy) {
 	from("build/libs/")
 	into("dist/")
-	include("*.war")
 }
 
 task cleanWebpack(type: Delete) {
