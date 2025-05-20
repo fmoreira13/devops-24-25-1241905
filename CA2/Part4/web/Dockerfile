@@ -10,9 +10,9 @@ RUN git clone https://github.com/fmoreira13/devops-24-25-1241905.git .
 WORKDIR /usr/src/app/CA1/Part3/react-and-spring-data-rest-basic
 
 RUN chmod +x gradlew
-RUN ./gradlew bootWar
+RUN ./gradlew build
 
-RUN cp ./build/libs/ROOT.war /usr/local/tomcat/webapps/
+RUN cp ./build/libs/react-and-spring-data-rest-basic-0.0.1-SNAPSHOT.jar /usr/local/tomcat/webapps/
 
 EXPOSE 8080
 
