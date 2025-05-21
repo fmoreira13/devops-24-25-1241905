@@ -738,6 +738,8 @@ services:
         ipv4_address: 192.168.56.10
     depends_on:
       - db
+    volumes:
+      - /Users/jFernando/IdeaProjects/DevOps/devops-24-25-1241905/CA1/Part3/react-and-spring-data-rest-basic:/usr/src/app/react-project
 
   db:
     build: ./db
@@ -752,7 +754,11 @@ services:
 
 networks:
   my_custom_network:
-    external: true
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.56.0/24
+
 ```
 
 ### Running the Application
