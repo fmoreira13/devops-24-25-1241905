@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'minhas-credenciais', url: 'https://github.com/fmoreira13/devops-24-25-1241905.git'
+                git credentialsId: 'cred-git', url: 'https://github.com/fmoreira13/devops-24-25-1241905.git'
             }
         }
         stage('Assemble') {
