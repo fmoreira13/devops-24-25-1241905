@@ -3,23 +3,34 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'cred-git', url: 'https://github.com/fmoreira13/devops-24-25-1241905.git'
+                echo 'Clonando o repositório público...'
+                git url: 'https://github.com/fmoreira13/devops-24-25-1241905.git', branch: 'main'
             }
         }
         stage('Assemble') {
             steps {
-                sh './gradlew assemble'
+                dir('CA1/Part2/gradle_basic_demo') {
+                    echo 'Compilando a aplicação...'
+                    sh 'chmod +x gradlew'
+                    sh './gradlew clean assemble'
+                }
             }
         }
         stage('Test') {
             steps {
-                sh './gradlew test'
-                junit 'build/test-results/test/*.xml'
+                dir('CA1/Part2/gradle_basic_demo') {
+                    echo 'Executando testes...'
+                    sh './gradlew test'
+                    junit '**/build/test-results/**/*.xml'
+                }
             }
         }
         stage('Archive') {
             steps {
-                archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+                dir('CA1/Part2/gradle_basic_demo') {
+                    echo 'Arquivando artefatos...'
+                    archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+                }
             }
         }
     }
