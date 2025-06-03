@@ -1,4 +1,6 @@
 # Ignore Gradle project-specific cache directory
+!CA1/Part2/gradle_basic_demo/gradle/wrapper/gradle-wrapper.jar
+
 .gradle
 
 # Ignore Gradle build output directory
