@@ -170,9 +170,143 @@ This pipeline ensures that every commit pushed to the `main` branch is automatic
 
 ![des](imagens/jenkins1.png)
 
+### Part 2: CI/CD Pipeline for React & Spring Data REST
 
+In the second phase of this exercise, the CI/CD pipeline was expanded to cover a full-stack application that combines a React frontend with a Spring Data REST backend (located in `CA1/part3/react-and-spring-data-rest-basic`).
 
+To support containerization steps, a custom Jenkins Docker image was built with the Docker CLI included, allowing the pipeline to build and push Docker images as part of the automation process.
 
+#### Jenkinsfile for React + Spring Data REST
+
+```jenkinsfile
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_CREDENTIALS_ID = 'dockerhub-creds-id'
+        DOCKER_IMAGE          = 'moreirafernandoj/springboot-app'
+        DOCKER_REGISTRY       = 'https://index.docker.io/v1/'
+        REPO_URL              = 'https://github.com/fmoreira13/devops-24-25-1241905.git'
+        JAVA_HOME             = '/opt/java/openjdk'
+        PATH                  = "${JAVA_HOME}/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Clonando o código...'
+                git branch: 'main', url: env.REPO_URL
+            }
+        }
+
+        stage('Criar Dockerfile') {
+            steps {
+                dir('CA1/Part3/react-and-spring-data-rest-basic') {
+                    echo 'Creating Dockerfile...'
+                    script {
+                        writeFile file: 'Dockerfile', text: '''
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY build/libs/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
+'''
+                    }
+                }
+            }
+        }
+
+        stage('Assemble') {
+            steps {
+                dir('CA1/Part3/react-and-spring-data-rest-basic') {
+                    sh '''
+                        chmod +x gradlew
+                        ./gradlew clean assemble
+                    '''
+                }
+            }
+        }
+
+        stage('Testes') {
+            steps {
+                dir('CA1/Part3/react-and-spring-data-rest-basic') {
+                    sh './gradlew test'
+                    junit '**/build/test-results/**/*.xml'
+                }
+            }
+        }
+
+         stage('Javadoc') {
+             steps {
+                 dir('CA1/Part3/react-and-spring-data-rest-basic') {
+                     sh './gradlew javadoc'
+                     publishHTML(target: [
+                         reportDir: 'build/docs/javadoc',
+                         reportFiles: 'index.html',
+                         reportName: 'Documentação Javadoc',
+                         allowMissing: false,
+                         keepAll: true,
+                         alwaysLinkToLastBuild: true
+                     ])
+                 }
+            }
+         }
+
+        stage('Arquivar JAR') {
+            steps {
+                dir('CA1/Part3/react-and-spring-data-rest-basic') {
+                    archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('CA1/Part3/react-and-spring-data-rest-basic') {
+                    script {
+                        def app = docker.build("${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}", '.')
+                        docker.withRegistry(env.DOCKER_REGISTRY, env.DOCKER_CREDENTIALS_ID) {
+                            app.push()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
+```
+
+### Pipeline Stages
+
+- **Source Checkout:**
+Clones the `main` branch from GitHub into the Jenkins workspace.
+
+- **Dockerfile Generation:**
+Dynamically creates a Dockerfile that packages the Spring Boot JAR into a runnable container image.
+
+- **Build (Assemble):**
+Runs `./gradlew clean assemble` to compile and bundle both the React frontend and Spring Boot backend.
+
+- **Testing:**
+Executes unit tests and collects JUnit XML reports, which are displayed in Jenkins for test visibility and status tracking.
+
+- **Javadoc Generation:**
+Generates HTML-based API documentation using Javadoc and publishes it in Jenkins via the **HTML Publisher** plugin.
+
+- **Artifact Archiving:**
+Stores the compiled JAR file as a fingerprinted artifact, enabling traceability across deployments.
+
+- **Docker Image Build:**
+Constructs a Docker image using the previously generated Dockerfile.
+
+- **Docker Image Push:**
+Pushes the built image to Docker Hub, authenticating with the stored Jenkins credentials.
 
 
 
