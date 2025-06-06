@@ -18,14 +18,7 @@ pipeline {
             }
         }
 
-        stage('Print JAVA_HOME') {
-            steps {
-                sh 'echo $JAVA_HOME'
-                sh 'java -version'
-            }
-        }
-
-        stage('Criar Dockerfile') {
+        stage('Criate Dockerfile') {
             steps {
                 dir('CA1/Part3/react-and-spring-data-rest-basic') {
                     echo 'Criando Dockerfile...'
@@ -78,7 +71,7 @@ ENTRYPOINT ["java","-jar","app.jar"]
              }
          }
 
-        stage('Arquivar JAR') {
+        stage('Arquive JAR') {
             steps {
                 dir('CA1/Part3/react-and-spring-data-rest-basic') {
                     archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
