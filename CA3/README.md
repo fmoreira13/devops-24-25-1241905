@@ -308,10 +308,71 @@ Constructs a Docker image using the previously generated Dockerfile.
 - **Docker Image Push:**
 Pushes the built image to Docker Hub, authenticating with the stored Jenkins credentials.
 
+### Custom Jenkins Controller Image
+
+To enable Docker command execution within the pipeline, we created a personalized Jenkins container image:
+
+```dockerfile
+FROM jenkins/jenkins:lts
+
+USER root
+RUN apt-get update && apt-get install -y docker.io
+USER jenkins
+```
+
+- **Build and Launch Jenkins**
 
 
+  Use the following commands to build the custom Jenkins image and start the container:
+```bash
+docker stop jenkins2
+docker rm jenkins2
+
+docker run -d \
+  --name jenkins2 \
+  -p 8080:8080 \
+  -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  jenkins/jenkins:lts-jdk17
+```
+
+- **Add Credentials for Docker Hub**
+
+In Jenkins, navigate to Manage Jenkins → Manage Credentials → Global → Add Credentials → Username and Password
+Set the ID as dockerhub-creds-id.
+
+- **Create the Pipeline Job**
+
+Go to New Item → Pipeline
+Set Definition to Pipeline script from SCM → Select Git → Enter repository URL and branch main
+Specify the Script Path as `CA1/part3/react-and-spring-data-rest-basic/Jenkinsfile`.
 
 
+- **Execute and Verify**
+
+Trigger the build with `Build Now, monitor the console output through each stage.
+Check your Docker Hub repository to ensure the Docker image has been successfully pushed.
+
+This configuration automates the entire process of building, testing, generating documentation, and containerizing our React and Spring application seamlessly.
+
+## Conclusion
+
+This project strengthened the complete CI/CD process by creating two Jenkins pipelines—from a straightforward Gradle build to a comprehensive React + Spring Data REST application with containerization. Important lessons learned include:
+
+**Pipeline as code**
+Implementing each phase (checkout, build, test, documentation, archiving, Docker image creation) in a Jenkinsfile guarantees that every update goes through the same automated workflow.
+
+**Automated quality checks**
+Executing unit tests and publishing JUnit reports helps detect issues early, while generating and publishing Javadoc ensures documentation stays current.
+
+**Artifact handling**
+Fingerprinting archived JAR files allows for easy tracking, and creating Dockerfiles on the fly ensures consistent container builds.
+
+**Docker integration**
+Developing a custom Jenkins master image with Docker capabilities enabled image building and pushing directly from the pipeline, simplifying deployment.
+
+By encoding all these steps, we removed manual steps, minimized errors, and sped up delivery. This practical experience enhanced my understanding of Jenkins declarative pipelines and Docker processes, setting a solid base for more complex cloud or Kubernetes deployments.
 
 
 
