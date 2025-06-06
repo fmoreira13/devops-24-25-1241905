@@ -6,6 +6,8 @@ pipeline {
         DOCKER_IMAGE          = 'moreirafernandoj/springboot-app'
         DOCKER_REGISTRY       = 'https://index.docker.io/v1/'
         REPO_URL              = 'https://github.com/fmoreira13/devops-24-25-1241905.git'
+        JAVA_HOME             = '/opt/java/openjdk'
+        PATH                  = "${JAVA_HOME}/bin:${env.PATH}"
     }
 
     stages {
@@ -13,6 +15,13 @@ pipeline {
             steps {
                 echo 'Clonando o código...'
                 git branch: 'main', url: env.REPO_URL
+            }
+        }
+
+        stage('Print JAVA_HOME') {
+            steps {
+                sh 'echo $JAVA_HOME'
+                sh 'java -version'
             }
         }
 
@@ -36,8 +45,10 @@ ENTRYPOINT ["java","-jar","app.jar"]
         stage('Assemble') {
             steps {
                 dir('CA1/Part3/react-and-spring-data-rest-basic') {
-                    sh 'chmod +x gradlew'
-                    sh './gradlew clean assemble'
+                    sh '''
+                        chmod +x gradlew
+                        ./gradlew clean assemble
+                    '''
                 }
             }
         }
@@ -51,21 +62,21 @@ ENTRYPOINT ["java","-jar","app.jar"]
             }
         }
 
-        stage('Javadoc') {
-            steps {
-                dir('CA1/Part3/react-and-spring-data-rest-basic') {
-                    sh './gradlew javadoc'
-                    publishHTML(target: [
-                        reportDir: 'build/docs/javadoc',
-                        reportFiles: 'index.html',
-                        reportName: 'Documentação Javadoc',
-                        allowMissing: false,
-                        keepAll: true,
-                        alwaysLinkToLastBuild: true
-                    ])
-                }
-            }
-        }
+         stage('Javadoc') {
+             steps {
+                 dir('CA1/Part3/react-and-spring-data-rest-basic') {
+                     sh './gradlew javadoc'
+                     publishHTML(target: [
+                         reportDir: 'build/docs/javadoc',
+                         reportFiles: 'index.html',
+                         reportName: 'Documentação Javadoc',
+                         allowMissing: false,
+                         keepAll: true,
+                         alwaysLinkToLastBuild: true
+                     ])
+                 }
+             }
+         }
 
         stage('Arquivar JAR') {
             steps {
