@@ -166,6 +166,9 @@ In Jenkins:
 - Monitor the console output to follow each stage of the process.
 - Once complete, test results will be shown under the **Tests** tab, and the generated JAR will appear under **Last Successful Artifacts**.
 
+![des](imagens/jenkins2.png)
+
+
 This pipeline ensures that every commit pushed to the `main` branch is automatically validated, tested, and packaged. It delivers rapid feedback and consistently produces reliable build artifacts ready for further stages in the development lifecycle.
 
 ![des](imagens/jenkins1.png)
@@ -322,7 +325,6 @@ USER jenkins
 
 - **Build and Launch Jenkins**
 
-
   Use the following commands to build the custom Jenkins image and start the container:
 ```bash
 docker stop jenkins2
@@ -354,7 +356,11 @@ Specify the Script Path as `CA1/part3/react-and-spring-data-rest-basic/Jenkinsfi
 Trigger the build with `Build Now, monitor the console output through each stage.
 Check your Docker Hub repository to ensure the Docker image has been successfully pushed.
 
+![des](imagens/jenkins3.png)
+
 This configuration automates the entire process of building, testing, generating documentation, and containerizing our React and Spring application seamlessly.
+
+![des](imagens/jenkins4.png)
 
 ## Conclusion
 
